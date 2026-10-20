@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Data and models - never bake these in
+data/
+*.db
+*.db-shm
+*.db-wal
+.captions.json
+
+# Secrets
+.env
+
+# Tooling
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.vscode/
+.idea/
+.git/
+.github/
+docs/
+tests/
+*.md
+!README.md

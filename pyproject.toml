@@ -52,6 +52,10 @@ Issues = "https://github.com/Gunjannnn30/fieldnote/issues"
 [tool.setuptools.packages.find]
 include = ["fieldnote*"]
 
+[tool.setuptools.package-data]
+# The browser UI is a static file inside the package.
+fieldnote = ["serve/static/*.html"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"

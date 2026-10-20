@@ -178,6 +178,31 @@ class Citation:
 
 
 @dataclass
+class Trace:
+    """How the answer was reached.
+
+    A field technician does not need to read this, but a service manager
+    asking "why did it say that?" does, and a system that cannot show its
+    work is a system nobody will trust with a safety-related number.
+    """
+
+    spaces: dict[str, int] = field(default_factory=dict)
+    fused: int = 0
+    shortlist: int = 0
+    units: int = 0
+    winner: dict[str, Any] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "spaces": self.spaces,
+            "fused": self.fused,
+            "shortlist": self.shortlist,
+            "units": self.units,
+            "winner": self.winner,
+        }
+
+
+@dataclass
 class Answer:
     """Final synthesised answer with its evidence trail."""
 
@@ -188,6 +213,7 @@ class Answer:
     latency_ms: dict[str, float]
     answerable: bool = True
     unanswerable_reason: str | None = None
+    trace: Trace = field(default_factory=Trace)
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -198,4 +224,5 @@ class Answer:
             "latency_ms": self.latency_ms,
             "answerable": self.answerable,
             "unanswerable_reason": self.unanswerable_reason,
+            "trace": self.trace.to_dict(),
         }

@@ -54,7 +54,7 @@ This is not a free upgrade, and pretending otherwise would be dishonest:
 | OCR / VLM at query time | no | usually yes |
 | preserves numbers on charts | **no** | yes |
 
-The measured cost on this corpus, CPU-only, 8 cores: p95 of 2.7 s end to end
+The measured cost on this corpus, CPU-only, 8 cores: p95 of 2.9 s end to end
 at k=20, against a 6 s budget. The early-fusion version is roughly a second
 faster, and answers none of the 15 picture-only questions.
 Fieldnote pays the extra index, the extra query encoders and the fusion step,
@@ -267,7 +267,34 @@ is the signal that actually works there.
 
 ---
 
-## 5. What went wrong
+## 5. The interface
+
+A field tool has to be usable in one motion, on a phone, in sunlight, by
+someone holding a manifold gauge in the other hand. So:
+
+- the **answer is the hero** - one fragment, large, with a copy button;
+- the **evidence is immediately below it**, visible without scrolling far, with
+  the actual crop rather than a description of it;
+- the **retrieval trace is shown, not hidden** - 40 text hits, 40 picture
+  hits, 19 audio hits, 99 fused, 29 reranked, 27 fragments read, and the
+  winning fragment verbatim. A service manager asking "why did it say that?"
+  can be answered without a developer;
+- the question lives in the URL, so an answer is a shareable link.
+
+The interface changed shape during the build. The first version had a large
+hero and twelve example questions, which pushed the answer below the fold on
+a laptop. Once there is an answer, the hero shrinks and the example list
+collapses to three per group - the marketing copy gets out of the way exactly
+when it stops being useful.
+
+The crop is shown at full width and the *whole page* is one click away, with
+the cited region outlined. That view - full page, region marked - is the one
+that settles a disagreement with a customer, and it is the reason the system
+keeps a rectangle for every citation instead of just a path.
+
+---
+
+## 6. What went wrong
 
 Kept here because the failures are the interesting part.
 
@@ -318,7 +345,35 @@ cross-encoder over 150 fused candidates; a shortlist of 30 does the same job.
 
 ---
 
-## 6. What I would do next
+## 7. Deployment
+
+The service is a plain FastAPI app with a static browser UI beside it. Three
+ways to run it, in increasing order of permanence:
+
+| | command | good for |
+|---|---|---|
+| local | `fieldnote serve` | a laptop on a bench |
+| LAN | `fieldnote serve --host 0.0.0.0` | a shop floor, tablets on wifi |
+| published | `docker compose up -d --build` | a VPS, a cluster, a demo |
+
+The Docker image is deliberately plain: CPU-only torch (the CUDA build is 2 GB
+larger and would be unused), models baked in at build time so the first
+request is not a download, a non-root user, a healthcheck, and the corpus and
+index built on first start into a volume.
+
+**A note on the environment this was built in.** The machine the project was
+developed on is itself a guest without nested virtualization, so Docker
+Desktop's Linux engine cannot start there - WSL2 needs the host to expose
+virtualization to the guest. The compose file validates
+(`docker compose config`), the Dockerfile is written for a standard
+`python:3.11-slim` base, and `scripts/docker_up.sh` / `.ps1` wrap the whole
+build-healthy-tunnel sequence into one command. The live link that was
+published during development was served directly by the process behind
+`cloudflared`, from exactly the same code the container runs.
+
+---
+
+## 8. What I would do next
 
 - **A real corpus.** Everything above is measured on a synthetic one. The
   first thing I would change is the figure detection: real manuals have

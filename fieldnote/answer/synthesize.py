@@ -19,7 +19,7 @@ from __future__ import annotations
 import re
 
 from ..config import settings
-from ..schema import Answer, Modality, ScoredChunk
+from ..schema import Answer, Modality, ScoredChunk, Trace
 from .citations import build_citations
 from .units import EvidenceUnit, build_units, chunk_relevance_map, pick_answer_value, score_units
 
@@ -123,6 +123,21 @@ class ExtractiveSynthesizer(Synthesizer):
             modality_hits=hits,
             latency_ms=latency,
             answerable=True,
+            trace=Trace(
+                winner={
+                    "chunk_id": best.chunk_id,
+                    "modality": best.modality.value,
+                    "score": round(best.score, 4),
+                    "ce_score": round(best.ce_score, 3),
+                    "chunk_relevance": round(best.chunk_relevance, 3),
+                    "value_quality": best.value_quality,
+                    "text": best.text,
+                    "context": best.context[:400],
+                    "doc_title": best.chunk.doc_title,
+                    "page": best.chunk.page,
+                    "region": best.chunk.region_label,
+                }
+            ),
         )
 
     @staticmethod

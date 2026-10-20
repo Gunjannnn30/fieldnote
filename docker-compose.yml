@@ -1,0 +1,43 @@
+# Fieldnote - one command to a running service.
+#
+#   docker compose up -d --build
+#   open http://localhost:8000/
+#
+# The corpus and the index are built on first start and kept in the named
+# volume, so restarts are instant.
+
+services:
+  fieldnote:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: fieldnote:latest
+    container_name: fieldnote
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - fieldnote-data:/app/data
+    environment:
+      FIELDNOTE_DATA_DIR: /app/data
+      FIELDNOTE_STORE_BACKEND: sqlite
+      FIELDNOTE_DEVICE: cpu
+      FIELDNOTE_TORCH_THREADS: "4"
+      # Raise for a busier host. The default 4 is a good fit for a small VPS.
+      OMP_NUM_THREADS: "4"
+    # The model download and the first corpus build need room and a little time.
+    shm_size: "1gb"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 600s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  fieldnote-data:

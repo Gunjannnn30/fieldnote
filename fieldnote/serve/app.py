@@ -35,6 +35,7 @@ class AskRequest(BaseModel):
 
 
 class CitationPayload(BaseModel):
+    chunk_id: str
     modality: str
     source_id: str
     doc_title: str
@@ -59,6 +60,7 @@ class AskResponse(BaseModel):
     modality_hits: dict[str, int]
     latency_ms: float
     stage_ms: dict[str, float]
+    trace: dict[str, Any] = Field(default_factory=dict)
 
 
 def _encode_image(path: str | None) -> str | None:
@@ -76,6 +78,7 @@ def _to_payload(answer: Answer, include_crops: bool) -> list[CitationPayload]:
     for cit in answer.citations:
         out.append(
             CitationPayload(
+                chunk_id=cit.chunk_id,
                 modality=cit.modality.value,
                 source_id=cit.source_id,
                 doc_title=cit.doc_title,
@@ -127,7 +130,15 @@ def create_app(backend: str | None = None) -> FastAPI:
 
     @app.get("/health")
     def health() -> dict[str, Any]:
-        return {"status": "ok", "indexed": state["system"] is not None}
+        manifest = settings.artifacts_dir / "manifest.jsonl"
+        index = settings.index_dir / "fieldnote.db"
+        return {
+            "status": "ok",
+            "ready": manifest.exists() and index.exists(),
+            "loaded": state["system"] is not None,
+            "corpus": manifest.exists(),
+            "index": index.exists(),
+        }
 
     @app.get("/", include_in_schema=False)
     def index() -> Any:
@@ -149,6 +160,14 @@ def create_app(backend: str | None = None) -> FastAPI:
             req.question, result.candidates, latency=result.timings, units=result.units
         )
         elapsed = (time.perf_counter() - t0) * 1000
+
+        trace = answer.trace.to_dict()
+        trace["spaces"] = result.space_counts()
+        trace["fused"] = sum(len(v) for v in result.per_space.values())
+        trace["shortlist"] = result.shortlist_size
+        trace["units"] = len(result.units)
+        trace["stage_ms"] = {k: round(v, 1) for k, v in result.timings.items()}
+
         return AskResponse(
             question=req.question,
             answer=answer.answer,
@@ -157,6 +176,7 @@ def create_app(backend: str | None = None) -> FastAPI:
             modality_hits=answer.modality_hits,
             latency_ms=round(elapsed, 1),
             stage_ms={k: round(v, 1) for k, v in result.timings.items()},
+            trace=trace,
         )
 
     @app.get("/evidence/{chunk_id}")
@@ -174,7 +194,62 @@ def create_app(backend: str | None = None) -> FastAPI:
                 return JSONResponse(payload)
         raise HTTPException(status_code=404, detail=f"no chunk {chunk_id}")
 
+    @app.get("/page/{chunk_id}")
+    def page(chunk_id: str) -> Any:
+        """The full manual page, with the cited region outlined.
+
+        This is the view that settles a disagreement: the technician sees the
+        whole page and exactly where on it the number was read from.
+        """
+        from fastapi.responses import Response
+
+        from ..ingest import read_manifest
+
+        manifest = settings.artifacts_dir / "manifest.jsonl"
+        if not manifest.exists():
+            raise HTTPException(status_code=503, detail="No manifest.")
+        for chunk in read_manifest(manifest):
+            if chunk.chunk_id != chunk_id:
+                continue
+            if not chunk.page_image_path or not Path(chunk.page_image_path).exists():
+                raise HTTPException(status_code=404, detail="no page image for this chunk")
+            image = _highlight_page(chunk)
+            if image is None:
+                raise HTTPException(status_code=404, detail="page image could not be read")
+            import io
+
+            buffer = io.BytesIO()
+            image.save(buffer, format="PNG")
+            return Response(buffer.getvalue(), media_type="image/png")
+        raise HTTPException(status_code=404, detail=f"no chunk {chunk_id}")
+
     return app
+
+
+def _highlight_page(chunk) -> Any:
+    """Draw the cited rectangle on the full page render."""
+    from PIL import Image, ImageDraw
+
+    try:
+        image = Image.open(chunk.page_image_path).convert("RGB")
+    except Exception:  # noqa: BLE001
+        return None
+    if not chunk.bbox:
+        return image
+    draw = ImageDraw.Draw(image)
+    x0, y0, x1, y1 = chunk.bbox.as_tuple()
+    pad = 6
+    draw.rectangle(
+        [max(0, x0 - pad), max(0, y0 - pad), min(image.width, x1 + pad), min(image.height, y1 + pad)],
+        outline=(255, 196, 0),
+        width=5,
+    )
+    draw.rectangle(
+        [max(0, x0 - pad), max(0, y0 - pad), min(image.width, x1 + pad), min(image.height, y1 + pad)],
+        outline=(40, 30, 0),
+        width=1,
+    )
+    return image
 
 
 app = create_app()

@@ -22,9 +22,18 @@ class Settings(BaseSettings):
     # --- paths -------------------------------------------------------------
     root: Path = ROOT
     data_dir: Path = ROOT / "data"
-    corpus_dir: Path = ROOT / "data" / "corpus"
-    index_dir: Path = ROOT / "data" / "index"
-    artifacts_dir: Path = ROOT / "data" / "artifacts"
+
+    @property
+    def corpus_dir(self) -> Path:
+        return self.data_dir / "corpus"
+
+    @property
+    def index_dir(self) -> Path:
+        return self.data_dir / "index"
+
+    @property
+    def artifacts_dir(self) -> Path:
+        return self.data_dir / "artifacts"
 
     # --- models ------------------------------------------------------------
     text_model: str = "sentence-transformers/all-MiniLM-L6-v2"
@@ -65,7 +74,6 @@ class Settings(BaseSettings):
 
 settings = Settings()
 settings.ensure_dirs()
-
 # Thread count is set at import time so every torch consumer inherits it.
 os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
 os.environ.setdefault("HF_HUB_DISABLE_SYMLINKS_WARNING", "1")

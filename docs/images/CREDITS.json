@@ -1,0 +1,47 @@
+[
+  {
+    "file": "rooftop-hvac.jpg",
+    "caption": "Rooftop HVAC units on a commercial building.",
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/130420-F-ZZ999-101_%2815718415681%29%2C_rooftop_HVAC.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+    "descurl": "https://commons.wikimedia.org/wiki/File:130420-F-ZZ999-101_(15718415681),_rooftop_HVAC.jpg",
+    "license": "Public domain",
+    "license_url": "",
+    "artist": "Los Angeles Air Force Base Space and Missile System Center"
+  },
+  {
+    "file": "air-handler.jpg",
+    "caption": "An air handling unit serving part of a large building.",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8a/Air_Handler_Unit_aanzuiging.JPG/1920px-Air_Handler_Unit_aanzuiging.JPG?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "descurl": "https://commons.wikimedia.org/wiki/File:Air_Handler_Unit_aanzuiging.JPG",
+    "license": "CC0",
+    "license_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "artist": "Alf van Beem"
+  },
+  {
+    "file": "rooftop-units-brisbane.jpg",
+    "caption": "Air handling units on the roof of a large commercial building.",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1b/Air_handling_units_in_large_commercial_building%2C_Brisbane.jpg/1920px-Air_handling_units_in_large_commercial_building%2C_Brisbane.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "descurl": "https://commons.wikimedia.org/wiki/File:Air_handling_units_in_large_commercial_building,_Brisbane.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Kgbo"
+  },
+  {
+    "file": "chiller.jpg",
+    "caption": "An air cooled liquid chiller in a plant room.",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/Air_Cooled_Liquid_Chiller.jpg/1920px-Air_Cooled_Liquid_Chiller.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "descurl": "https://commons.wikimedia.org/wiki/File:Air_Cooled_Liquid_Chiller.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Saud"
+  },
+  {
+    "file": "outdoor-unit.jpg",
+    "caption": "An outdoor condensing unit.",
+    "url": "https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b7/2011-11-06_AC_unit_at_Duke_East.jpg/1920px-2011-11-06_AC_unit_at_Duke_East.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+    "descurl": "https://commons.wikimedia.org/wiki/File:2011-11-06_AC_unit_at_Duke_East.jpg",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "artist": "Ildar Sagdejev (Specious)"
+  }
+]

@@ -55,6 +55,7 @@ class RetrievalResult:
     per_space: dict[str, list[tuple[IndexedRecord, float]]] = field(default_factory=dict)
     timings: dict[str, float] = field(default_factory=dict)
     units: list = field(default_factory=list)
+    shortlist_size: int = 0
 
     @property
     def top(self) -> ScoredChunk | None:
@@ -62,6 +63,9 @@ class RetrievalResult:
 
     def by_modality(self, modality: Modality) -> list[ScoredChunk]:
         return [c for c in self.candidates if c.chunk.modality is modality]
+
+    def space_counts(self) -> dict[str, int]:
+        return {space: len(hits) for space, hits in self.per_space.items()}
 
 
 class Retriever:
@@ -150,6 +154,7 @@ class Retriever:
 
         candidates = fused.candidates
         units: list = []
+        shortlist_size = 0
 
         if rerank and candidates:
             from .rerank import rerank as rerank_candidates
@@ -176,6 +181,7 @@ class Retriever:
                 stored_vectors=stored_vectors,
             )
             timings["rerank_ms"] = (time.perf_counter() - t0) * 1000
+            shortlist_size = len(shortlist)
 
             # Fill the remaining slots with the best of the rest, so the
             # caller still gets k candidates.
@@ -201,6 +207,7 @@ class Retriever:
             per_space=per_space,
             timings=timings,
             units=units,
+            shortlist_size=shortlist_size,
         )
 
     # ------------------------------------------------------------------
