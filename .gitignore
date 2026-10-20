@@ -1,0 +1,28 @@
+# --- data and generated artefacts ---------------------------------------
+data/*
+!data/artifacts/
+data/artifacts/*
+!data/artifacts/eval_report.md
+!data/artifacts/eval_report.json
+
+# --- python -------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# --- secrets ------------------------------------------------------------
+.env
+
+# --- editors ------------------------------------------------------------
+.vscode/
+.idea/
+*.swp
+.DS_Store

@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fieldnote"
+version = "0.1.0"
+description = "Multimodal retrieval for HVAC field service: text, images and audio in one index, with verifiable citations."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Gunjan Jain" }]
+keywords = ["multimodal", "rag", "retrieval", "hvac", "cross-encoder", "clip", "whisper"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "torch>=2.2",
+    "transformers>=4.44",
+    "sentence-transformers>=3.0",
+    "numpy>=1.24",
+    "pillow>=10.0",
+    "pymupdf>=1.24",
+    "rapidocr-onnxruntime>=1.3",
+    "sentencepiece>=0.2",
+    "pydantic>=2.6",
+    "pydantic-settings>=2.2",
+    "typer>=0.12",
+    "rich>=13.0",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "matplotlib>=3.8",
+]
+
+[project.optional-dependencies]
+pgvector = ["psycopg[binary]>=3.1", "pgvector>=0.2.5"]
+qdrant = ["qdrant-client>=1.9"]
+dev = ["pytest>=8.0", "pytest-asyncio>=0.23", "ruff>=0.4"]
+
+[project.scripts]
+fieldnote = "fieldnote.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/Gunjannnn30/fieldnote"
+Issues = "https://github.com/Gunjannnn30/fieldnote/issues"
+
+[tool.setuptools.packages.find]
+include = ["fieldnote*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501"]
