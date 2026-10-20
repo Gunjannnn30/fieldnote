@@ -11,6 +11,17 @@ one question, and an answer the technician can check against the page.
 > the manufacturer's support line. All three have to be reachable by typing a
 > question.
 
+**Try it in two commands:**
+
+```bash
+pip install -e ".[dev]"
+fieldnote serve --tunnel        # prints a public URL and opens a browser UI
+```
+
+Then read [Use it right now](#use-it-right-now) for the browser, the terminal
+and the API, and [How to explain this](#how-to-explain-this) for a ten-second,
+thirty-second and two-minute version you can reuse.
+
 ---
 
 ## The claim, and the evidence for it
@@ -91,6 +102,69 @@ can be a caption of a picture. That is the costume.
 
 ### Late fusion, three spaces, one cross-encoder
 
+## Deploying it somewhere permanent
+
+`--tunnel` gives you a URL that lasts as long as the process. For something
+that stays up, run it on a host.
+
+### Docker (any VPS, or a container platform)
+
+```bash
+docker build -t fieldnote .
+docker run -d -p 8000:8000 -v fieldnote-data:/app/data --name fieldnote fieldnote
+```
+
+The image is CPU-only (no CUDA, ~2 GB smaller) and ships the models, so the
+first request is not a two-gigabyte download. The corpus and index are built
+on first start and cached in the volume.
+
+### A plain VPS
+
+```bash
+git clone https://github.com/Gunjannnn30/fieldnote.git && cd fieldnote
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e .
+
+fieldnote models
+fieldnote build && fieldnote ingest && fieldnote index
+
+# systemd unit
+sudo tee /etc/systemd/system/fieldnote.service > /dev/null <<'EOF'
+[Unit]
+Description=Fieldnote
+After=network.target
+
+[Service]
+WorkingDirectory=/srv/fieldnote
+ExecStart=/srv/fieldnote/.venv/bin/fieldnote serve --host 0.0.0.0 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl enable --now fieldnote
+```
+
+Put it behind nginx or Caddy for TLS, or use a tunnel in front of it.
+
+### The only thing to change for real data
+
+`FIELDNOTE_CORPUS_DIR` points at your manuals, photos and recordings:
+
+```bash
+export FIELDNOTE_CORPUS_DIR=/srv/hvac-corpus
+fieldnote ingest
+fieldnote index
+```
+
+`ingest` walks the directory and dispatches by file type - `.pdf` for manuals,
+images for job photos, `.wav` / `.mp3` / `.m4a` for calls. Nothing else about
+the system assumes the synthetic corpus.
+
+---
+
+### Late fusion, three spaces, one cross-encoder
+
 ```
                     question (text)
                           |
@@ -163,24 +237,39 @@ the latency budget.
 
 ---
 
-## Running it
+## Use it right now
+
+### Option 1 - the browser (easiest)
 
 ```bash
-git clone https://github.com/Gunjannnn30/fieldnote.git
-cd fieldnote
+fieldnote serve --tunnel
+```
 
-pip install -e ".[dev]"
+That starts the service on your machine and prints a public address:
 
-fieldnote models        # pre-download the six models (~2 GB)
-fieldnote build         # render the synthetic corpus
-fieldnote ingest        # manuals -> pages, crops, OCR, transcripts
-fieldnote index         # encode into the vector store
+```
+LIVE       https://<something>.trycloudflare.com
+UI         https://<something>.trycloudflare.com/
+API docs   https://<something>.trycloudflare.com/docs
+```
+
+Open the UI, type a question, press **Ask**. You get the answer, the time it
+took, and the picture of the exact spot the answer came from.
+
+The address changes every time you restart, and the tunnel only exists while
+the process is running. To keep it on your own network instead:
+
+```bash
+fieldnote serve --host 0.0.0.0        # then http://192.168.1.14:8000/ from any device
+```
+
+### Option 2 - the terminal
+
+```bash
 fieldnote ask "What is the high-pressure cutout pressure labeled on the R-410A pressure-temperature curve?"
 ```
 
 ```
-What is the high-pressure cutout pressure labeled on the R-410A pressure-temperature curve?
-
 385 (385 PSI)
 
  #  modality  source                            page  region   crop
@@ -189,14 +278,131 @@ What is the high-pressure cutout pressure labeled on the R-410A pressure-tempera
  3  image     Trane Precedent YSC072 Service M…   12   wiring…  …/p0012-r00-wiring_diagram.png
 ```
 
-Run the eval, the API and the tests:
+### Option 3 - the API
 
 ```bash
-fieldnote eval                       # writes data/artifacts/eval_report.md
-fieldnote serve --port 8000          # POST /ask returns the crop as base64
-pytest -m slow                       # integration tests
-pytest                               # fast unit tests
+curl -X POST http://127.0.0.1:8000/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What model number is stamped on the nameplate in the job site photo?","include_crops":true}'
 ```
+
+```json
+{
+  "answer": "MODEL NP-42",
+  "latency_ms": 2732.4,
+  "citations": [
+    {
+      "modality": "image",
+      "doc_title": "Job Photo - Unit 7 Nameplate",
+      "page": null,
+      "region": "job_photo",
+      "crop_b64": "data:image/png;base64,iVBORw0KGgo..."
+    }
+  ]
+}
+```
+
+| endpoint | what it does |
+|---|---|
+| `POST /ask` | ask a question; returns the answer and the citations |
+| `GET /` | the browser UI |
+| `GET /health` | liveness, and whether the index is loaded |
+| `GET /evidence/{chunk_id}` | the raw chunk behind a citation, with its image |
+| `GET /docs` | interactive OpenAPI documentation |
+
+### From scratch on a new machine
+
+```bash
+git clone https://github.com/Gunjannnn30/fieldnote.git
+cd fieldnote
+pip install -e ".[dev]"
+
+fieldnote models        # pre-download the six models (~2 GB)
+fieldnote build         # render the synthetic corpus
+fieldnote ingest        # manuals -> pages, crops, OCR, transcripts
+fieldnote index         # encode into the vector store
+fieldnote serve         # http://127.0.0.1:8000/
+```
+
+`fieldnote build` and `fieldnote ingest` are only needed once. After that,
+`fieldnote serve` is all you need.
+
+### The commands
+
+| command | what it does |
+|---|---|
+| `fieldnote build` | render the synthetic corpus (manuals, photos, calls) |
+| `fieldnote ingest` | turn the corpus into a chunk manifest (pages, crops, OCR, transcripts) |
+| `fieldnote index` | encode the manifest into the vector store |
+| `fieldnote ask "..."` | one question, with citations |
+| `fieldnote serve` | the API and the browser UI |
+| `fieldnote eval` | run the evaluation, write the report |
+| `fieldnote verify` | check the fixtures are honest (no leaks, everything legible) |
+| `fieldnote models` | pre-download every model |
+
+---
+
+## How to explain this
+
+Three lengths, depending on who is listening.
+
+### Ten seconds
+
+> It's a search engine for HVAC technicians. The manuals have graphs and
+> wiring diagrams, and the answer is usually a number printed on a graph. Most
+> AI tools throw those numbers away by describing the picture instead of
+> reading it. This one keeps the picture as a picture, so it can tell you the
+> number - and it shows you the picture so you can check it.
+
+### Thirty seconds
+
+> A tech on a roof types one question. Fieldnote searches the manuals, the job
+> photos and the recorded support calls at the same time, with a different
+> searcher for each - one that reads text, one that looks at pictures, one
+> that listens to sound. It then ranks what each one found and picks the best
+> evidence.
+>
+> The important part: the picture searcher works on the actual pixels. A
+> pressure-temperature curve is never turned into a description like "a line
+> going up", because that description does not contain the 385 the technician
+> needs. Fieldnote reads the number off the graph and hands back the answer
+> with a crop of the exact spot, so the tech can verify it against the manual.
+
+### Two minutes - the sharp version
+
+**The problem.** A commercial HVAC contractor runs 40 field technicians. The
+knowledge is spread across 300 manuals full of wiring diagrams and pressure
+curves, 4,000 photos of failed parts, and recorded calls to the manufacturer's
+support line. A tech asking "why does unit 7 keep tripping on high pressure"
+needs a number from a chart on page 112, a model number off a nameplate in a
+photo, and a location from a phone call.
+
+**The trap.** The standard approach to "multimodal" search is to caption every
+image with a vision model and embed the caption as text. It works right up
+until the question needs a number. A caption of a pressure curve says "a graph
+with a line going up" - it has no 385 in it, and because the captioning
+happened at *indexing* time, nothing downstream can get it back. That is a
+text pipeline wearing a costume.
+
+**The approach.** Fieldnote indexes each modality in the space where its
+signal is strongest - pixels for images, waveforms for audio, tokens for prose
+- and fuses the three result lists with Reciprocal Rank Fusion before a
+cross-encoder makes the final call. The picture is still pixels at the moment
+the question is asked, so the numbers are still there.
+
+**The evidence.** On a 40-question eval where 15 questions are *provably*
+unanswerable from text, Fieldnote scores 100% against the caption-only
+baseline's 0%. The baseline is implemented properly - same reranker, same
+grader, same synthesis - so the only difference is whether the images were
+flattened. Notably the baseline still *retrieves* the right chart; it just
+cannot read the number off it. Retrieval was never the problem. The lossy step
+in the middle was.
+
+**The honest caveat.** The corpus is synthetic, because the real manuals are
+not in this repository. The system is real; the numbers are measured on a
+corpus we generated. A real corpus of 300 scanned manuals will be harder.
+
+---
 
 ### The corpus is synthetic, and that is a deliberate limitation
 
@@ -265,14 +471,17 @@ fieldnote/
   baseline/            the caption-only system, implemented properly
   eval/                dataset, grader, runner, report
   fixtures/            the synthetic corpus and its self-checks
-  serve/               FastAPI app
+  serve/               FastAPI app and the browser UI
   cli.py               fieldnote build | ingest | index | ask | eval | serve
+Dockerfile             CPU-only image, models baked in
+docker/entrypoint.sh   builds the corpus and index on first start
 scripts/
   download_models.py   pre-fetch every model
   verify_fixtures.py   the two honesty checks
   run_eval.py          the eval, without the CLI
   debug_query.py       trace one query through every stage
   sanity_check.py      confirm the joint spaces actually line up
+  publish.py           create the GitHub repo and push
 ```
 
 ## Licence

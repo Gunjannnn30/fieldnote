@@ -129,6 +129,16 @@ def create_app(backend: str | None = None) -> FastAPI:
     def health() -> dict[str, Any]:
         return {"status": "ok", "indexed": state["system"] is not None}
 
+    @app.get("/", include_in_schema=False)
+    def index() -> Any:
+        """The browser UI."""
+        from fastapi.responses import HTMLResponse
+
+        page = Path(__file__).parent / "static" / "index.html"
+        if not page.exists():
+            raise HTTPException(status_code=404, detail="UI not installed")
+        return HTMLResponse(page.read_text(encoding="utf-8"))
+
     @app.post("/ask", response_model=AskResponse)
     def ask(req: AskRequest) -> AskResponse:
         system = _system()

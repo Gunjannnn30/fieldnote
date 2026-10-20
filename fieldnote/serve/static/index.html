@@ -1,0 +1,244 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fieldnote</title>
+<style>
+  :root {
+    --bg: #0e1116;
+    --panel: #161b22;
+    --panel-2: #1c232c;
+    --line: #2a313c;
+    --ink: #e6edf3;
+    --ink-dim: #9aa7b4;
+    --ink-faint: #6e7b8a;
+    --accent: #4fb0ff;
+    --accent-soft: rgba(79, 176, 255, 0.12);
+    --good: #4ec98a;
+    --crop: #f0b429;
+    --radius: 12px;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 28px 22px 80px; }
+
+  header { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 6px; }
+  h1 { font-size: 21px; letter-spacing: -0.01em; margin: 0; font-weight: 650; }
+  h1 span { color: var(--accent); }
+  .tagline { color: var(--ink-dim); font-size: 14px; }
+  .models { margin: 14px 0 26px; color: var(--ink-faint); font-family: var(--mono); font-size: 12px; }
+  .models b { color: var(--ink-dim); font-weight: 500; }
+
+  form { display: flex; gap: 10px; margin-bottom: 14px; }
+  input[type=text] {
+    flex: 1; padding: 13px 15px; font-size: 15px; color: var(--ink);
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
+    outline: none; transition: border-color .15s, box-shadow .15s;
+  }
+  input[type=text]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  button {
+    padding: 13px 22px; font-size: 15px; font-weight: 600; color: #04121e; cursor: pointer;
+    background: var(--accent); border: 0; border-radius: var(--radius); transition: filter .15s;
+  }
+  button:hover { filter: brightness(1.1); }
+  button:disabled { opacity: .55; cursor: progress; }
+
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+  .examples button {
+    padding: 7px 13px; font-size: 13px; font-weight: 450; color: var(--ink-dim);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 999px;
+  }
+  .examples button:hover { color: var(--ink); border-color: #3d4753; }
+
+  .card {
+    background: var(--panel); border: 1px solid var(--line);
+    border-radius: var(--radius); padding: 18px 20px; margin-bottom: 16px;
+  }
+  .card h2 {
+    font-size: 11px; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--ink-faint); margin: 0 0 12px; font-weight: 650;
+  }
+  .answer { font-size: 20px; line-height: 1.45; letter-spacing: -0.01em; }
+  .answer.empty { color: var(--ink-faint); font-size: 16px; }
+  .meta { margin-top: 12px; display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip {
+    font-family: var(--mono); font-size: 11.5px; color: var(--ink-dim);
+    background: var(--panel-2); border: 1px solid var(--line);
+    border-radius: 6px; padding: 3px 8px;
+  }
+  .chip b { color: var(--accent); font-weight: 600; }
+
+  .cites { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+  .cite { background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+  .cite figure { margin: 0; }
+  .cite img { display: block; width: 100%; background: #0a0d11; }
+  .cite .cap { padding: 11px 13px; }
+  .cite .doc { font-size: 13px; margin-bottom: 5px; }
+  .cite .snippet {
+    font-size: 12.5px; color: var(--ink-dim); font-family: var(--mono);
+    max-height: 3.6em; overflow: hidden; word-break: break-word;
+  }
+  .badge {
+    display: inline-block; font-family: var(--mono); font-size: 10.5px; font-weight: 650;
+    text-transform: uppercase; letter-spacing: .05em; padding: 2px 6px; border-radius: 4px;
+    background: var(--accent-soft); color: var(--accent); border: 1px solid rgba(79,176,255,.25);
+  }
+  .badge.image { color: var(--crop); background: rgba(240,180,41,.12); border-color: rgba(240,180,41,.3); }
+  .badge.audio { color: var(--good); background: rgba(78,201,138,.12); border-color: rgba(78,201,138,.3); }
+  .cite .where { font-family: var(--mono); font-size: 11.5px; color: var(--ink-faint); margin-top: 7px; }
+  .empty-note { color: var(--ink-faint); font-size: 13.5px; }
+
+  #status { font-size: 13px; color: var(--ink-faint); min-height: 20px; margin-bottom: 16px; }
+  .spin { display: inline-block; width: 11px; height: 11px; border: 2px solid var(--line);
+          border-top-color: var(--accent); border-radius: 50%; animation: s .7s linear infinite;
+          vertical-align: -1px; margin-right: 7px; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  footer { margin-top: 42px; padding-top: 18px; border-top: 1px solid var(--line);
+           color: var(--ink-faint); font-size: 12.5px; }
+  footer a { color: var(--ink-dim); }
+  .hide { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Field<span>note</span></h1>
+    <div class="tagline">Ask a question about the manuals, the job photos and the support calls.</div>
+  </header>
+  <div class="models">
+    <b>text</b> MiniLM &nbsp;·&nbsp; <b>pictures</b> CLIP &nbsp;·&nbsp; <b>sound</b> CLAP &nbsp;·&nbsp;
+    <b>rerank</b> cross-encoder &nbsp;·&nbsp; <b>fusion</b> RRF
+  </div>
+
+  <form id="ask">
+    <input id="q" type="text" autocomplete="off" spellcheck="false"
+           placeholder="What is the high-pressure cutout pressure on the R-410A curve?" />
+    <button id="go" type="submit">Ask</button>
+  </form>
+
+  <div class="examples" id="examples"></div>
+
+  <div id="status"></div>
+
+  <div class="card hide" id="answerCard">
+    <h2>Answer</h2>
+    <div class="answer" id="answer"></div>
+    <div class="meta" id="meta"></div>
+  </div>
+
+  <div class="card hide" id="citeCard">
+    <h2>Evidence <span style="text-transform:none;letter-spacing:0;font-weight:400">— every answer carries the picture it came from</span></h2>
+    <div class="cites" id="cites"></div>
+  </div>
+
+  <footer>
+    Fieldnote — multimodal retrieval for HVAC field service.
+    <a href="/docs">API docs</a> ·
+    <a href="https://github.com/Gunjannnn30/fieldnote" target="_blank" rel="noopener">source</a>
+  </footer>
+</div>
+
+<script>
+const EXAMPLES = [
+  "What is the high-pressure cutout pressure labeled on the R-410A pressure-temperature curve?",
+  "What is the low-pressure cutout pressure labeled on the R-410A pressure-temperature curve?",
+  "What field supply voltage is printed on the unit 7 wiring diagram?",
+  "What model number is stamped on the nameplate in the job site photo?",
+  "What pressure does the gauge in the job site photo read?",
+  "What fault code is displayed on the control board?",
+  "Which roof was the unit that kept tripping on high pressure located on?",
+  "What is the required filter differential pressure for the YSC072 economizer?",
+  "What is the factory charge weight of the 3-ton Carrier 48TC using R-410A?"
+];
+
+const $ = id => document.getElementById(id);
+$("examples").innerHTML = EXAMPLES
+  .map(q => `<button type="button">${q.replace(/</g, "&lt;")}</button>`).join("");
+$("examples").addEventListener("click", e => {
+  if (e.target.tagName !== "BUTTON") return;
+  $("q").value = e.target.textContent;
+  $("ask").requestSubmit();
+});
+
+function esc(s) {
+  return (s || "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+}
+
+async function ask(question) {
+  $("go").disabled = true;
+  $("status").innerHTML = '<span class="spin"></span>Searching text, pictures and sound…';
+  $("answerCard").classList.add("hide");
+  $("citeCard").classList.add("hide");
+  try {
+    const res = await fetch("/ask", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ question, include_crops: true })
+    });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    const d = await res.json();
+    render(d);
+  } catch (err) {
+    $("status").innerHTML = `<span style="color:#ff8080">Could not reach the service: ${esc(err.message)}</span>`;
+  } finally {
+    $("go").disabled = false;
+  }
+}
+
+function render(d) {
+  $("status").innerHTML = '';
+  $("answerCard").classList.remove("hide");
+  $("citeCard").classList.remove("hide");
+
+  $("answer").textContent = d.answer;
+  $("answer").className = d.answer ? "answer" : "answer empty";
+
+  const chips = [
+    `${d.latency_ms} ms`,
+    `k=${d.citations.length ? "…" : "0"} citations`,
+  ];
+  for (const [m, n] of Object.entries(d.modality_hits || {})) {
+    if (n) chips.push(`${m}: ${n}`);
+  }
+  $("meta").innerHTML = chips.map(c => `<span class="chip">${esc(c)}</span>`).join("");
+
+  if (!d.citations.length) {
+    $("cites").innerHTML = '<div class="empty-note">No evidence was cited for this question.</div>';
+    return;
+  }
+  $("cites").innerHTML = d.citations.map(c => {
+    const where = [];
+    if (c.page) where.push(`page ${c.page}`);
+    if (c.region) where.push(c.region);
+    if (c.start_sec != null) where.push(`${Math.round(c.start_sec)}–${Math.round(c.end_sec)}s`);
+    const img = c.crop_b64
+      ? `<img src="${c.crop_b64}" alt="cited evidence">`
+      : `<div class="empty-note" style="padding:26px 14px">no image for this citation</div>`;
+    return `<div class="cite">
+      <figure>${img}</figure>
+      <div class="cap">
+        <div class="doc"><span class="badge ${esc(c.modality)}">${esc(c.modality)}</span> ${esc(c.doc_title)}</div>
+        <div class="snippet">${esc(c.snippet)}</div>
+        <div class="where">${esc(where.join(" · "))} &nbsp; score ${Number(c.score).toFixed(3)}</div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+$("ask").addEventListener("submit", e => {
+  e.preventDefault();
+  const q = $("q").value.trim();
+  if (q) ask(q);
+});
+$("q").value = EXAMPLES[0];
+</script>
+</body>
+</html>

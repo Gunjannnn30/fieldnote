@@ -148,16 +148,87 @@ def eval_cmd(
 
 @app.command("serve")
 def serve_cmd(
-    host: str = typer.Option("127.0.0.1"),
+    host: str = typer.Option("127.0.0.1", help="Bind address. 0.0.0.0 exposes it on the LAN."),
     port: int = typer.Option(8000),
     backend: str = typer.Option(settings.store_backend),
+    tunnel: bool = typer.Option(
+        False,
+        help="Also open a public https URL with cloudflared (needs cloudflared on PATH).",
+    ),
 ) -> None:
-    """Run the HTTP API."""
+    """Run the HTTP API and the browser UI."""
     import uvicorn
 
     from .serve.app import create_app
 
-    uvicorn.run(create_app(backend=backend), host=host, port=port)
+    app = create_app(backend=backend)
+
+    if not tunnel:
+        console.print(f"[green]UI[/green]      http://{host}:{port}/")
+        console.print(f"[green]API docs[/green] http://{host}:{port}/docs")
+        uvicorn.run(app, host=host, port=port)
+        return
+
+    _serve_with_tunnel(app, host, port)
+
+
+def _serve_with_tunnel(app, host: str, port: int) -> None:
+    """Serve locally and put a public tunnel in front of it."""
+    import re
+    import subprocess
+    import threading
+    import time
+
+    import uvicorn
+
+    thread = threading.Thread(
+        target=lambda: uvicorn.run(app, host=host, port=port, log_level="warning"),
+        daemon=True,
+    )
+    thread.start()
+    time.sleep(2.0)
+
+    try:
+        proc = subprocess.Popen(
+            [
+                "cloudflared", "tunnel", "--url", f"http://127.0.0.1:{port}",
+                "--no-autoupdate",
+            ],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+        )
+    except FileNotFoundError as err:
+        console.print("[red]cloudflared is not on PATH[/red] - install it or drop --tunnel")
+        raise typer.Exit(1) from err
+
+    url: str | None = None
+    deadline = time.time() + 60
+    while time.time() < deadline and url is None:
+        line = proc.stdout.readline() if proc.stdout else ""
+        if not line:
+            if proc.poll() is not None:
+                break
+            continue
+        match = re.search(r"https://[a-z0-9-]+\.trycloudflare\.com", line)
+        if match:
+            url = match.group(0)
+
+    if url:
+        console.print(f"\n[bold green]LIVE[/bold green]  {url}")
+        console.print(f"[green]UI[/green]      {url}/")
+        console.print(f"[green]API docs[/green] {url}/docs")
+        console.print("\n[dim]the tunnel lives as long as this process runs (ctrl-c to stop)[/dim]\n")
+    else:
+        console.print("[yellow]no tunnel url appeared; check the cloudflared output[/yellow]")
+
+    try:
+        while proc.poll() is None:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        pass
+    finally:
+        proc.terminate()
 
 
 @app.command("verify")

@@ -109,3 +109,16 @@ def test_the_api_returns_the_crop(chunks):
     payload = response.json()
     assert contains_answer("NP-42", payload["answer"]), payload["answer"]
     assert any(c["crop_b64"] for c in payload["citations"])
+
+
+def test_the_browser_ui_is_served(chunks):
+    from fastapi.testclient import TestClient
+
+    from fieldnote.serve.app import create_app
+
+    client = TestClient(create_app(backend="sqlite"))
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "Fieldnote" in response.text
+    assert "/ask" in response.text
+
