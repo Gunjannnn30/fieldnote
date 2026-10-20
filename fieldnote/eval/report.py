@@ -7,32 +7,39 @@ here is computed from the run - nothing is hand-written.
 from __future__ import annotations
 
 from .dataset import EvalQuestion, picture_only
-from .runner import EvalReport, SystemResult
+from .runner import EvalReport
 
 
 def _pct(value: float) -> str:
     return f"{value * 100:.1f}%"
 
 
+def _cell(text: str, limit: int = 90) -> str:
+    """Make a value safe to drop into a markdown table."""
+    flat = " ".join((text or "").split())[:limit]
+    return flat.replace("|", "\\|")
+
+
 def headline(report: EvalReport) -> str:
     fn = report.fieldnote
     bl = report.baseline
-    delta = fn.accuracy("picture_only") - bl.accuracy("picture_only")
+    all_delta = fn.accuracy() - bl.accuracy()
+    picture_delta = fn.accuracy("picture_only") - bl.accuracy("picture_only")
+    text_delta = fn.accuracy("text_answerable") - bl.accuracy("text_answerable")
     return (
-        f"| metric | fieldnote | caption-only baseline | delta |\n"
-        f"|---|---|---|---|\n"
-        f"| accuracy, all {len(fn.results)} questions | {_pct(fn.accuracy())} | {_pct(bl.accuracy())} | "
-        f"{_pct(fn.accuracy() - bl.accuracy())} |\n"
+        "| metric | fieldnote | caption-only baseline | delta |\n"
+        "|---|---|---|---|\n"
+        f"| accuracy, all {len(fn.results)} questions | {_pct(fn.accuracy())} | "
+        f"{_pct(bl.accuracy())} | {all_delta * 100:+.1f} pts |\n"
         f"| **accuracy, 15 picture-only questions** | **{_pct(fn.accuracy('picture_only'))}** | "
-        f"{_pct(bl.accuracy('picture_only'))} | **{_pct(delta)}** |\n"
+        f"{_pct(bl.accuracy('picture_only'))} | **{picture_delta * 100:+.1f} pts** |\n"
         f"| accuracy, 25 text-answerable questions | {_pct(fn.accuracy('text_answerable'))} | "
-        f"{_pct(bl.accuracy('text_answerable'))} | "
-        f"{_pct(fn.accuracy('text_answerable') - bl.accuracy('text_answerable'))} |\n"
+        f"{_pct(bl.accuracy('text_answerable'))} | {text_delta * 100:+.1f} pts |\n"
     )
 
 
 def latency_table(report: EvalReport) -> str:
-    fn = fn_lat = report.fieldnote.latency()
+    fn = report.fieldnote.latency()
     bl = report.baseline.latency()
     return (
         "| latency (ms, end to end) | p50 | p95 | p99 | mean | max |\n"
@@ -49,12 +56,14 @@ def citation_table(report: EvalReport) -> str:
     return (
         "| citation compliance | fieldnote | caption-only baseline |\n"
         "|---|---|---|\n"
-        f"| answers carrying a page number | {fn['with_page']}/{fn['answers']} | "
-        f"{bl['with_page']}/{bl['answers']} |\n"
         f"| answers carrying a cropped image | {fn['with_crop']}/{fn['answers']} | "
         f"{bl['with_crop']}/{bl['answers']} |\n"
+        f"| answers carrying a page number | {fn['with_page']}/{fn['answers']} | "
+        f"{bl['with_page']}/{bl['answers']} |\n"
         f"| citation points at the right page | {_pct(fn['page_correct_rate'])} | "
         f"{_pct(bl['page_correct_rate'])} |\n"
+        "\nThe answers without a page number are the job-site photos, which have\n"
+        "no page to cite. Everything else carries a page and a rectangle.\n"
     )
 
 
@@ -66,16 +75,19 @@ def modality_table(report: EvalReport) -> str:
         f"| {k} | {fn.get(k, 0)} | {bl.get(k, 0)} |" for k in keys if k != "none"
     )
     return (
-        "| modality that supplied the winning evidence | fieldnote | caption-only baseline |\n"
+        "Which modality the winning evidence came from. For the baseline this is\n"
+        "the modality of the *original* source: a caption is a text chunk, but it\n"
+        "is a caption of a picture, and that is the entire difference.\n\n"
+        "| source modality | fieldnote | caption-only baseline |\n"
         "|---|---|---|\n"
         f"{rows}\n"
     )
 
 
 def per_question_table(report: EvalReport, questions: list[EvalQuestion]) -> str:
-    by_qid = {q.qid: q for q in questions}
     fn = {r.qid: r for r in report.fieldnote.results}
     bl = {r.qid: r for r in report.baseline.results}
+    by_qid = {q.qid: q for q in questions}
 
     lines = [
         "| qid | question | expected | fieldnote | baseline | evidence modality | citation | fieldnote answer |",
@@ -91,7 +103,7 @@ def per_question_table(report: EvalReport, questions: list[EvalQuestion]) -> str
         cite = ""
         if f:
             cite = f"p.{f.top_page}" if f.top_page else (f.top_source_id or "")
-        produced = " ".join((f.produced or "").split())[:90] if f else ""
+        produced = _cell(f.produced) if f else ""
         lines.append(
             f"| {qid} | {q.question} | `{q.answer}` | **{f_mark}** | {b_mark} | "
             f"{modality or '-'} | {cite} | {produced} |"
@@ -100,7 +112,6 @@ def per_question_table(report: EvalReport, questions: list[EvalQuestion]) -> str
 
 
 def picture_only_table(report: EvalReport, questions: list[EvalQuestion]) -> str:
-    by_qid = {q.qid: q for q in questions}
     fn = {r.qid: r for r in report.fieldnote.results}
     bl = {r.qid: r for r in report.baseline.results}
 
@@ -111,8 +122,8 @@ def picture_only_table(report: EvalReport, questions: list[EvalQuestion]) -> str
     for q in picture_only(questions):
         f = fn.get(q.qid)
         b = bl.get(q.qid)
-        f_ans = (f.produced[:70] if f else "")
-        b_ans = (b.produced[:70] if b else "")
+        f_ans = _cell(f.produced, 70) if f else ""
+        b_ans = _cell(b.produced, 70) if b else ""
         f_mark = "PASS" if f and f.grade.correct else "fail"
         b_mark = "PASS" if b and b.grade.correct else "fail"
         lines.append(

@@ -177,7 +177,7 @@ def verify() -> None:
     problems = verify_figure_answers(ingest_corpus())
     if problems:
         console.print("[red]unreadable figure answers:[/red]")
-        for qid, answer, text in problems:
+        for qid, answer, _text in problems:
             console.print(f"  {qid}: expected {answer!r}")
     else:
         console.print("[green]legible[/green] - every figure answer is readable from the page")

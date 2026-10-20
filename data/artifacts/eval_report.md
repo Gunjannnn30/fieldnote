@@ -4,35 +4,42 @@
 
 | metric | fieldnote | caption-only baseline | delta |
 |---|---|---|---|
-| accuracy, all 40 questions | 100.0% | 60.0% | 40.0% |
-| **accuracy, 15 picture-only questions** | **100.0%** | 0.0% | **100.0%** |
-| accuracy, 25 text-answerable questions | 100.0% | 96.0% | 4.0% |
+| accuracy, all 40 questions | 100.0% | 60.0% | +40.0 pts |
+| **accuracy, 15 picture-only questions** | **100.0%** | 0.0% | **+100.0 pts** |
+| accuracy, 25 text-answerable questions | 100.0% | 96.0% | +4.0 pts |
 
 
 ## 2. Latency
 
 | latency (ms, end to end) | p50 | p95 | p99 | mean | max |
 |---|---|---|---|---|---|
-| fieldnote | 1607.0 | 1985.5 | 2205.6 | 1583.6 | 2205.6 |
-| caption-only baseline | 1275.3 | 2506.3 | 30086.9 | 2098.3 | 30086.9 |
+| fieldnote | 2222.7 | 2698.9 | 3189.2 | 2181.0 | 3189.2 |
+| caption-only baseline | 1800.4 | 3024.0 | 4286.5 | 1866.8 | 4286.5 |
 
 
 ## 3. Citation compliance
 
 | citation compliance | fieldnote | caption-only baseline |
 |---|---|---|
-| answers carrying a page number | 36/40 | 40/40 |
 | answers carrying a cropped image | 40/40 | 0/40 |
+| answers carrying a page number | 36/40 | 40/40 |
 | citation points at the right page | 90.0% | 87.5% |
+
+The answers without a page number are the job-site photos, which have
+no page to cite. Everything else carries a page and a rectangle.
 
 
 ## 4. Which modality supplied the answer
 
-| modality that supplied the winning evidence | fieldnote | caption-only baseline |
+Which modality the winning evidence came from. For the baseline this is
+the modality of the *original* source: a caption is a text chunk, but it
+is a caption of a picture, and that is the entire difference.
+
+| source modality | fieldnote | caption-only baseline |
 |---|---|---|
 | audio | 5 | 6 |
-| image | 11 | 0 |
-| text | 24 | 34 |
+| image | 11 | 2 |
+| text | 24 | 32 |
 
 
 ## 5. The 15 picture-only questions
@@ -47,7 +54,7 @@
 | I06 | What subcooling target is labeled on the subcooling verification chart? | `16` | **PASS** 16 (TARGET 16 DEGF) | fail Figure 9. Subcooling verification at rated load. |
 | I07 | What field supply voltage is printed on the YSC072 unit 7 wiring diagram? | `240V 3PH 60HZ` | **PASS** FIELD SUPPLY 240 V 3PH 60 HZ | fail Set the cooling temperature differential to 4°F for the standard YSC07 |
 | I08 | What disconnect rating is printed on the YSC072 unit 7 wiring diagram? | `60A` | **PASS** 60 (DISCONNECT 60A) | fail During startup the unit disconnect must show at least 187V on a 208V s |
-| I09 | What high-pressure switch setpoint is printed on the unit 7 wiring diagram? | `600 PSI` | **PASS** 600 (HP SWITCH 600 PSI) | fail Hi, I've got a rooftop unit that keeps tripping on high pressure. |
+| I09 | What high-pressure switch setpoint is printed on the unit 7 wiring diagram? | `600 PSI` | **PASS** 600 (HP SWITCH 600 PSI) | fail I could not find evidence in the corpus that answers this question. Th |
 | I10 | What minimum supply air temperature is listed in the coil capacity table? | `55°F` | **PASS** 55 (55 DEG F) | fail Set the supply air total external static pressure to 0.75 in. w.c. Thi |
 | I11 | What maximum indoor airflow is listed in the 6-ton capacity table? | `2400 CFM` | **PASS** 2400 (2400 CFM) | fail Set the supply air total external static pressure to 0.75 in. w.c. Thi |
 | I12 | What model number is stamped on the nameplate in the job site photo? | `NP-42` | **PASS** MODEL NP-42 | fail I need to see the nameplate on the unit to confirm the model and the r |

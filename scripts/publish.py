@@ -11,7 +11,6 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from pathlib import Path
 
 OWNER = "Gunjannnn30"
 NAME = "fieldnote"
@@ -22,7 +21,7 @@ DESCRIPTION = (
 
 
 def credential() -> tuple[str, str]:
-    payload = "protocol=https\nhost=github.com\nusername=%s\n\n" % OWNER
+    payload = f"protocol=https\nhost=github.com\nusername={OWNER}\n\n"
     proc = subprocess.run(
         ["git", "credential-manager", "get"],
         input=payload,

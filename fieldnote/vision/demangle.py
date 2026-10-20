@@ -29,7 +29,7 @@ VOCABULARY: set[str] = {
     "HIGH", "LOW", "PRESSURE", "CUTOUT", "TRIP", "SETPOINT", "TARGET", "PEAK",
     "MAX", "MIN", "SUPERHEAT", "SUBCOOLING", "SUBLCOOLING", "SUBCOOL", "TEMPERATURE",
     "AMBIENT", "SATURATION", "BUBBLE", "LIQUID", "DEW", "VAPOR", "DISCHARGE",
-    "SUPERHEAT", "LOAD", "RATED", "PERCENT", "POWER", "TOTAL", "CAPACITY",
+    "LOAD", "RATED", "PERCENT", "POWER", "TOTAL", "CAPACITY",
     # equipment
     "COMPRESSOR", "CONTACTOR", "COIL", "CONDENSER", "EVAPORATOR", "BLOWER",
     "FAN", "MOTOR", "VALVE", "TXV", "EXPANSION", "FILTER", "DRIER", "ACCUMULATOR",
@@ -37,32 +37,25 @@ VOCABULARY: set[str] = {
     "COMP", "COMPRESSORS", "SWITCHES", "BREAKER", "FUSES", "FUSE",
     # electrical
     "FIELD", "SUPPLY", "DISCONNECT", "SWITCH", "WIRING", "DIAGRAM", "CONTROL",
-    "LOW", "VOLTAGE", "CURRENT", "GROUND", "AUXILIARY", "STAT", "CONTACTOR",
-    "LPS", "HPS", "UNIT", "PAGE", "SEE", "CONNECTION", "ON", "OF", "TO", "AND",
-    "LOW", "HP", "LP", "SW", "L1", "L2", "L3", "PHASE", "CIRCUIT",
+    "VOLTAGE", "CURRENT", "GROUND", "AUXILIARY", "STAT", "LPS", "HPS", "UNIT", "PAGE", "SEE", "CONNECTION", "ON", "OF", "TO", "AND",
+    "HP", "LP", "SW", "L1", "L2", "L3", "PHASE", "CIRCUIT",
     # identification
     "MODEL", "NAMEPLATE", "NAME", "PLATE", "SERIAL", "NP", "PN", "PART",
-    "VOLTAGE", "FAULT", "CODE", "STATUS", "GAUGE", "MANIFOLD", "READING",
-    "PRESSURE", "DATA", "INFORMATION", "ROOFTOP", "PACKAGED", "MANUFACTURING",
-    "OIL", "PACK", "CONDENSING", "UNIT", "TABLES", "TABLE", "ADJUSTMENT",
+    "FAULT", "CODE", "STATUS", "GAUGE", "MANIFOLD", "READING",
+    "DATA", "INFORMATION", "ROOFTOP", "PACKAGED", "MANUFACTURING",
+    "OIL", "PACK", "CONDENSING", "TABLES", "TABLE", "ADJUSTMENT",
     "VERIFICATION", "BAND", "CHART", "CURVE", "PERFORMANCE", "COOLING", "HEATING",
-    "EFFICIENCY", "RATED", "LOAD", "COIL", "DATA", "TONS", "TON", "AIR",
-    "INDOOR", "OUTDOOR", "SUPPLY", "RETURN", "MIXED", "ENTERING", "LEAVING",
-    "SUPERHEAT", "RANGE", "SET", "SETTING", "CHECK", "TEST", "PROCEDURE",
-    "INSTALLED", "INSTALLATION", "SERVICE", "MANUAL", "FIGURE", "TABLE", "SHEET",
+    "EFFICIENCY", "TONS", "TON", "AIR",
+    "INDOOR", "OUTDOOR", "RETURN", "MIXED", "ENTERING", "LEAVING",
+    "RANGE", "SET", "SETTING", "CHECK", "TEST", "PROCEDURE",
+    "INSTALLED", "INSTALLATION", "SERVICE", "MANUAL", "FIGURE", "SHEET",
     "R", "C", "A", "W", "V", "F",
 }
 
-_SPLIT_PUNCT = re.compile(r"[^A-Za-z0-9.]+")
-_NUM = re.compile(r"^\d+(?:\.\d+)?$")
 _NUM_PREFIX = re.compile(r"^\d+(?:\.\d+)?")
 
 
 _SINGLE_LETTERS = {"R", "C", "A", "W", "V", "F"}
-
-
-def _is_number(token: str) -> bool:
-    return bool(_NUM.match(token))
 
 
 def _split_token(token: str) -> list[str] | None:
@@ -79,7 +72,7 @@ def _split_token(token: str) -> list[str] | None:
     if not upper.replace(".", "").isalnum():
         return None
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def solve(i: int) -> tuple[str, ...] | None:
         if i >= len(upper):
             return ()

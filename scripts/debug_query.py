@@ -32,7 +32,7 @@ def main() -> int:
 
     print(f"\nquestion: {question}")
     print(f"retrieval took {elapsed:.0f} ms   stages={ {k: round(v) for k, v in result.timings.items()} }")
-    print(f"\nper-space hits: " + ", ".join(f"{k}={len(v)}" for k, v in result.per_space.items()))
+    print("\nper-space hits: " + ", ".join(f"{k}={len(v)}" for k, v in result.per_space.items()))
 
     print("\nrank modality  page  fused  rerank  chunk")
     for i, cand in enumerate(result.candidates, start=1):
@@ -49,7 +49,6 @@ def main() -> int:
     print(f"\nANSWER: {answer.answer}")
     print(f"answerable: {answer.answerable}")
 
-    from fieldnote.answer.units import chunk_relevance_map
 
     print("\nevidence units:")
     for unit in (result.units or [])[:10]:

@@ -40,14 +40,14 @@ class Region:
     def as_rect(self) -> fitz.Rect:
         return fitz.Rect(self.x0, self.y0, self.x1, self.y1)
 
-    def overlaps(self, other: "Region", threshold: float = 0.3) -> bool:
+    def overlaps(self, other: Region, threshold: float = 0.3) -> bool:
         ix0, iy0 = max(self.x0, other.x0), max(self.y0, other.y0)
         ix1, iy1 = min(self.x1, other.x1), min(self.y1, other.y1)
         inter = max(0.0, ix1 - ix0) * max(0.0, iy1 - iy0)
         smaller = min(self.area, other.area) or 1.0
         return inter / smaller > threshold
 
-    def union(self, other: "Region") -> "Region":
+    def union(self, other: Region) -> Region:
         return Region(
             min(self.x0, other.x0),
             min(self.y0, other.y0),
@@ -72,7 +72,7 @@ def _long_axis_lines(drawings: list, rect: fitz.Rect) -> int:
     return count
 
 
-def detect_regions(page: "fitz.Page", min_area: float = 900.0) -> list[Region]:
+def detect_regions(page: fitz.Page, min_area: float = 900.0) -> list[Region]:
     """Find chart / diagram / photo / table regions on a page."""
     regions: list[Region] = []
 
@@ -135,7 +135,7 @@ def detect_regions(page: "fitz.Page", min_area: float = 900.0) -> list[Region]:
     return out
 
 
-def _classify(page: "fitz.Page", region: Region, drawings: list) -> str:
+def _classify(page: fitz.Page, region: Region, drawings: list) -> str:
     rect = region.as_rect()
     label = region.label if region.label != "vector" else "vector"
 

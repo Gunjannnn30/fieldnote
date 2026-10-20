@@ -190,7 +190,7 @@ _WIRING_TOKENS = ("diagram", "wiring", "field supply", "disconnect", "contactor"
 _TABLE_TOKENS = ("cfm", "min supply air", "max indoor", "ton", "capacity", "c fm", "amps")
 
 
-def _text_from_blocks(page: "fitz.Page", rect) -> str:
+def _text_from_blocks(page: fitz.Page, rect) -> str:
     """Rebuild a page's text from its blocks, keeping paragraphs intact."""
     try:
         blocks = page.get_text("blocks", clip=rect)
@@ -213,7 +213,7 @@ def _text_from_blocks(page: "fitz.Page", rect) -> str:
     return "\n\n".join(paragraphs).strip()
 
 
-def _nearest_caption(page: "fitz.Page", region) -> str:
+def _nearest_caption(page: fitz.Page, region) -> str:
     """Find the figure caption printed near a region on the page.
 
     The caption is the one piece of *readable* text that describes a figure:
@@ -273,7 +273,7 @@ def _refine_region_label(ocr_text: str, base_label: str) -> str:
     return base_label if base_label != "photo" else "figure"
 
 
-def _crop(pix: "fitz.Pixmap", bbox: BBox, out_path: Path) -> None:
+def _crop(pix: fitz.Pixmap, bbox: BBox, out_path: Path) -> None:
     """Crop a rendered page pixmap using pixel coordinates."""
     import numpy as np
     from PIL import Image

@@ -8,11 +8,11 @@
     "n_text": 25,
     "latency": {
       "count": 40,
-      "p50_ms": 1607.0,
-      "p95_ms": 1985.5,
-      "p99_ms": 2205.6,
-      "mean_ms": 1583.6,
-      "max_ms": 2205.6
+      "p50_ms": 2222.7,
+      "p95_ms": 2698.9,
+      "p99_ms": 3189.2,
+      "mean_ms": 2181.0,
+      "max_ms": 3189.2
     },
     "citations": {
       "answers": 40,
@@ -37,11 +37,11 @@
     "n_text": 25,
     "latency": {
       "count": 40,
-      "p50_ms": 1275.3,
-      "p95_ms": 2506.3,
-      "p99_ms": 30086.9,
-      "mean_ms": 2098.3,
-      "max_ms": 30086.9
+      "p50_ms": 1800.4,
+      "p95_ms": 3024.0,
+      "p99_ms": 4286.5,
+      "mean_ms": 1866.8,
+      "max_ms": 4286.5
     },
     "citations": {
       "answers": 40,
@@ -52,8 +52,9 @@
       "page_correct_rate": 0.875
     },
     "winning_modality": {
-      "text": 34,
-      "audio": 6
+      "text": 32,
+      "audio": 6,
+      "image": 2
     }
   },
   "unanswerable_violations": [],
@@ -71,7 +72,7 @@
           "detail": "'0 . 5 in . w . c .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1613.3,
+        "latency_ms": 2025.1,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 3,
         "top_modality": "text",
@@ -94,7 +95,7 @@
           "detail": "'0 . 75 in . w . c .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1585.3,
+        "latency_ms": 2288.1,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -117,7 +118,7 @@
           "detail": "'15 minutes' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1750.6,
+        "latency_ms": 2390.3,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -140,7 +141,7 @@
           "detail": "'10 minutes' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 2205.6,
+        "latency_ms": 2140.4,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 6,
         "top_modality": "text",
@@ -163,7 +164,7 @@
           "detail": "'12 inches' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1985.5,
+        "latency_ms": 2474.0,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 7,
         "top_modality": "text",
@@ -186,7 +187,7 @@
           "detail": "'12 in . lb' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1674.5,
+        "latency_ms": 2028.0,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 8,
         "top_modality": "text",
@@ -209,7 +210,7 @@
           "detail": "'20 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1576.3,
+        "latency_ms": 2222.4,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 9,
         "top_modality": "text",
@@ -232,7 +233,7 @@
           "detail": "'1 / 8 in .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1646.6,
+        "latency_ms": 2315.8,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 3,
         "top_modality": "text",
@@ -255,7 +256,7 @@
           "detail": "'40a' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1440.1,
+        "latency_ms": 2086.9,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -278,7 +279,7 @@
           "detail": "'8 . 5 lb' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1938.0,
+        "latency_ms": 2474.7,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -301,7 +302,7 @@
           "detail": "'4' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1283.8,
+        "latency_ms": 1748.7,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 6,
         "top_modality": "text",
@@ -324,7 +325,7 @@
           "detail": "'187v' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1392.0,
+        "latency_ms": 1899.1,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 7,
         "top_modality": "text",
@@ -347,7 +348,7 @@
           "detail": "'5 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1843.3,
+        "latency_ms": 2464.9,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -370,7 +371,7 @@
           "detail": "'8 f to 12 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 2129.7,
+        "latency_ms": 3189.2,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -393,7 +394,7 @@
           "detail": "'125 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1824.1,
+        "latency_ms": 2638.7,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -416,7 +417,7 @@
           "detail": "'24v' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1350.8,
+        "latency_ms": 1880.9,
         "top_source_id": "pdf:jk_yk_series_installation_manual",
         "top_page": 3,
         "top_modality": "text",
@@ -439,7 +440,7 @@
           "detail": "'0 . 25 in . w . c .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1483.6,
+        "latency_ms": 1955.7,
         "top_source_id": "pdf:jk_yk_series_installation_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -462,7 +463,7 @@
           "detail": "'4 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1582.8,
+        "latency_ms": 2222.7,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 10,
         "top_modality": "text",
@@ -485,7 +486,7 @@
           "detail": "'2 psi' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1848.9,
+        "latency_ms": 2540.1,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 8,
         "top_modality": "text",
@@ -508,7 +509,7 @@
           "detail": "'115 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1844.4,
+        "latency_ms": 2457.3,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 6,
         "top_modality": "text",
@@ -531,7 +532,7 @@
           "detail": "'6 in . lb' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1821.4,
+        "latency_ms": 2698.9,
         "top_source_id": "pdf:jk_yk_series_installation_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -554,7 +555,7 @@
           "detail": "'roof b' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1607.0,
+        "latency_ms": 2104.9,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -577,7 +578,7 @@
           "detail": "'97 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1651.0,
+        "latency_ms": 2285.3,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -600,7 +601,7 @@
           "detail": "'the nameplate' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 858.2,
+        "latency_ms": 1380.7,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -623,7 +624,7 @@
           "detail": "'brown crust' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 937.2,
+        "latency_ms": 1485.8,
         "top_source_id": "aud:call_nameplate_mismatch",
         "top_page": null,
         "top_modality": "audio",
@@ -646,7 +647,7 @@
           "detail": "'385' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1917.8,
+        "latency_ms": 2784.0,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 11,
         "top_modality": "image",
@@ -669,7 +670,7 @@
           "detail": "'92' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1879.1,
+        "latency_ms": 2602.2,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 11,
         "top_modality": "image",
@@ -692,7 +693,7 @@
           "detail": "'425' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1763.9,
+        "latency_ms": 2435.2,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 11,
         "top_modality": "image",
@@ -715,7 +716,7 @@
           "detail": "'18' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1972.2,
+        "latency_ms": 2396.8,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 9,
         "top_modality": "text",
@@ -738,7 +739,7 @@
           "detail": "'32 . 5' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1581.2,
+        "latency_ms": 2002.1,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 10,
         "top_modality": "text",
@@ -761,7 +762,7 @@
           "detail": "'16' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1582.9,
+        "latency_ms": 2302.5,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 7,
         "top_modality": "text",
@@ -784,7 +785,7 @@
           "detail": "'240v 3ph 60hz' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1302.8,
+        "latency_ms": 1714.6,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 12,
         "top_modality": "image",
@@ -807,7 +808,7 @@
           "detail": "'60a' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1154.9,
+        "latency_ms": 1645.6,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 12,
         "top_modality": "image",
@@ -830,7 +831,7 @@
           "detail": "'600 psi' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1104.8,
+        "latency_ms": 1468.1,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 12,
         "top_modality": "image",
@@ -853,7 +854,7 @@
           "detail": "'55 f' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1450.4,
+        "latency_ms": 2173.7,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 11,
         "top_modality": "image",
@@ -876,7 +877,7 @@
           "detail": "'2400 cfm' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1744.5,
+        "latency_ms": 2561.0,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 11,
         "top_modality": "image",
@@ -899,7 +900,7 @@
           "detail": "'np - 42' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1145.7,
+        "latency_ms": 1759.6,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -922,7 +923,7 @@
           "detail": "'460v' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1347.8,
+        "latency_ms": 2404.9,
         "top_source_id": "img:job_photo_unit_7_nameplate",
         "top_page": null,
         "top_modality": "image",
@@ -945,7 +946,7 @@
           "detail": "'312' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1382.5,
+        "latency_ms": 2070.5,
         "top_source_id": "img:job_photo_suction_gauge",
         "top_page": null,
         "top_modality": "image",
@@ -968,7 +969,7 @@
           "detail": "'lp - 2' in answer"
         },
         "kind": "picture_only",
-        "latency_ms": 1139.4,
+        "latency_ms": 1520.8,
         "top_source_id": "img:job_photo_control_board",
         "top_page": null,
         "top_modality": "image",
@@ -993,7 +994,7 @@
           "detail": "'0 . 5 in . w . c .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1061.2,
+        "latency_ms": 1345.9,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 3,
         "top_modality": "text",
@@ -1016,7 +1017,7 @@
           "detail": "'0 . 75 in . w . c .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1265.1,
+        "latency_ms": 1888.9,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -1039,7 +1040,7 @@
           "detail": "'15 minutes' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1322.7,
+        "latency_ms": 1818.2,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -1062,7 +1063,7 @@
           "detail": "'10 minutes' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 892.2,
+        "latency_ms": 1271.8,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 6,
         "top_modality": "text",
@@ -1085,7 +1086,7 @@
           "detail": "'12 inches' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1238.3,
+        "latency_ms": 1904.8,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 7,
         "top_modality": "text",
@@ -1108,7 +1109,7 @@
           "detail": "'12 in . lb' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 918.7,
+        "latency_ms": 1446.0,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 8,
         "top_modality": "text",
@@ -1131,7 +1132,7 @@
           "detail": "'20 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1447.1,
+        "latency_ms": 1965.0,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 9,
         "top_modality": "text",
@@ -1154,7 +1155,7 @@
           "detail": "'1 / 8 in .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 977.3,
+        "latency_ms": 1469.8,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 3,
         "top_modality": "text",
@@ -1177,7 +1178,7 @@
           "detail": "'40a' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 861.8,
+        "latency_ms": 1242.9,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -1200,7 +1201,7 @@
           "detail": "'8 . 5 lb' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 840.1,
+        "latency_ms": 1327.0,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -1223,7 +1224,7 @@
           "detail": "'4' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 633.5,
+        "latency_ms": 1157.6,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 6,
         "top_modality": "text",
@@ -1246,7 +1247,7 @@
           "detail": "'187v' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1890.2,
+        "latency_ms": 3342.0,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 7,
         "top_modality": "text",
@@ -1269,7 +1270,7 @@
           "detail": "'5 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1389.0,
+        "latency_ms": 2169.1,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -1292,7 +1293,7 @@
           "detail": "'8 f to 12 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1128.5,
+        "latency_ms": 1717.9,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -1315,7 +1316,7 @@
           "detail": "'125 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1108.5,
+        "latency_ms": 2196.6,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -1338,7 +1339,7 @@
           "detail": "'24v' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 855.9,
+        "latency_ms": 1100.2,
         "top_source_id": "pdf:jk_yk_series_installation_manual",
         "top_page": 3,
         "top_modality": "text",
@@ -1361,7 +1362,7 @@
           "detail": "'0 . 25 in . w . c .' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1075.6,
+        "latency_ms": 1242.2,
         "top_source_id": "pdf:jk_yk_series_installation_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -1384,7 +1385,7 @@
           "detail": "'4 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1491.1,
+        "latency_ms": 1710.8,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 10,
         "top_modality": "text",
@@ -1407,7 +1408,7 @@
           "detail": "'2 psi' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1548.7,
+        "latency_ms": 1913.8,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 8,
         "top_modality": "text",
@@ -1430,7 +1431,7 @@
           "detail": "'115 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1654.8,
+        "latency_ms": 1807.3,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 6,
         "top_modality": "text",
@@ -1453,7 +1454,7 @@
           "detail": "'6 in . lb' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1349.8,
+        "latency_ms": 2313.9,
         "top_source_id": "pdf:jk_yk_series_installation_manual",
         "top_page": 5,
         "top_modality": "text",
@@ -1476,7 +1477,7 @@
           "detail": "'roof b' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 2506.3,
+        "latency_ms": 4286.5,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -1499,7 +1500,7 @@
           "detail": "'97 f' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 1505.0,
+        "latency_ms": 1800.4,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -1522,7 +1523,7 @@
           "detail": "expected 'the nameplate'"
         },
         "kind": "text_answerable",
-        "latency_ms": 1767.0,
+        "latency_ms": 2046.0,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -1545,7 +1546,7 @@
           "detail": "'brown crust' in answer"
         },
         "kind": "text_answerable",
-        "latency_ms": 2226.3,
+        "latency_ms": 2514.8,
         "top_source_id": "aud:call_nameplate_mismatch",
         "top_page": null,
         "top_modality": "audio",
@@ -1568,7 +1569,7 @@
           "detail": "expected '385'"
         },
         "kind": "picture_only",
-        "latency_ms": 1156.8,
+        "latency_ms": 1661.8,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 11,
         "top_modality": "text",
@@ -1591,7 +1592,7 @@
           "detail": "expected '92'"
         },
         "kind": "picture_only",
-        "latency_ms": 813.3,
+        "latency_ms": 1226.6,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 11,
         "top_modality": "text",
@@ -1614,7 +1615,7 @@
           "detail": "expected '425'"
         },
         "kind": "picture_only",
-        "latency_ms": 782.0,
+        "latency_ms": 1063.9,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 11,
         "top_modality": "text",
@@ -1637,7 +1638,7 @@
           "detail": "expected '18'"
         },
         "kind": "picture_only",
-        "latency_ms": 1275.3,
+        "latency_ms": 1681.4,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 9,
         "top_modality": "text",
@@ -1660,7 +1661,7 @@
           "detail": "expected '32 . 5'"
         },
         "kind": "picture_only",
-        "latency_ms": 842.2,
+        "latency_ms": 998.2,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 10,
         "top_modality": "text",
@@ -1683,7 +1684,7 @@
           "detail": "expected '16'"
         },
         "kind": "picture_only",
-        "latency_ms": 1152.2,
+        "latency_ms": 1420.3,
         "top_source_id": "pdf:lennox_xc14_service_manual",
         "top_page": 7,
         "top_modality": "text",
@@ -1706,7 +1707,7 @@
           "detail": "expected '240v 3ph 60hz'"
         },
         "kind": "picture_only",
-        "latency_ms": 1487.8,
+        "latency_ms": 1882.0,
         "top_source_id": "pdf:jk_yk_series_installation_manual",
         "top_page": 3,
         "top_modality": "text",
@@ -1729,7 +1730,7 @@
           "detail": "expected '60a'"
         },
         "kind": "picture_only",
-        "latency_ms": 1949.1,
+        "latency_ms": 2621.3,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 7,
         "top_modality": "text",
@@ -1744,7 +1745,7 @@
         "qid": "I09",
         "question": "What high-pressure switch setpoint is printed on the unit 7 wiring diagram?",
         "expected": "600 PSI",
-        "produced": "Hi, I've got a rooftop unit that keeps tripping on high pressure.",
+        "produced": "I could not find evidence in the corpus that answers this question. The retrieved material does not contain a supporting page, figure or call segment.",
         "grade": {
           "correct": false,
           "mode": "miss",
@@ -1752,16 +1753,16 @@
           "detail": "expected '600 psi'"
         },
         "kind": "picture_only",
-        "latency_ms": 1953.1,
+        "latency_ms": 2819.2,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 12,
-        "top_modality": "text",
+        "top_modality": "image",
         "citation_count": 3,
         "citation_has_page": true,
         "citation_has_crop": false,
         "citation_page_correct": true,
         "citation_modality": "audio",
-        "answerable": true
+        "answerable": false
       },
       {
         "qid": "I10",
@@ -1775,7 +1776,7 @@
           "detail": "expected '55 f'"
         },
         "kind": "picture_only",
-        "latency_ms": 1063.1,
+        "latency_ms": 1390.9,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 11,
         "top_modality": "text",
@@ -1798,7 +1799,7 @@
           "detail": "expected '2400 cfm'"
         },
         "kind": "picture_only",
-        "latency_ms": 886.0,
+        "latency_ms": 1008.6,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -1821,7 +1822,7 @@
           "detail": "expected 'np - 42'"
         },
         "kind": "picture_only",
-        "latency_ms": 2438.5,
+        "latency_ms": 3024.0,
         "top_source_id": "aud:call_unit7_hp_trip",
         "top_page": null,
         "top_modality": "audio",
@@ -1844,10 +1845,10 @@
           "detail": "expected '460v'"
         },
         "kind": "picture_only",
-        "latency_ms": 30086.9,
+        "latency_ms": 2614.2,
         "top_source_id": "pdf:carrier_48tc_service_manual",
         "top_page": 4,
-        "top_modality": "text",
+        "top_modality": "image",
         "citation_count": 3,
         "citation_has_page": true,
         "citation_has_crop": false,
@@ -1867,7 +1868,7 @@
           "detail": "expected '312'"
         },
         "kind": "picture_only",
-        "latency_ms": 1566.4,
+        "latency_ms": 1297.0,
         "top_source_id": "pdf:trane_ysc072_service_manual",
         "top_page": 4,
         "top_modality": "text",
@@ -1890,7 +1891,7 @@
           "detail": "expected 'lp - 2'"
         },
         "kind": "picture_only",
-        "latency_ms": 3522.6,
+        "latency_ms": 2962.0,
         "top_source_id": "aud:call_nameplate_mismatch",
         "top_page": null,
         "top_modality": "audio",

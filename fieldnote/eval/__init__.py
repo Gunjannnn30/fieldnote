@@ -14,7 +14,6 @@ from .runner import (
     System,
     SystemResult,
     build_baseline_system,
-    build_eval_set as _build_eval_set,
     build_fieldnote_system,
     run_full_eval,
     run_system,

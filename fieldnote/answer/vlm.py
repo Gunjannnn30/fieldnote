@@ -70,7 +70,7 @@ class VLMEngine:
         from PIL import Image
 
         content: list[dict] = []
-        for path in image_paths:
+        for _path in image_paths:
             content.append({"type": "image"})
         body = "\n".join(texts).strip()
         prompt = question.strip()

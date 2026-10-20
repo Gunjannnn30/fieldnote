@@ -13,7 +13,7 @@ over the candidate passage and the pair is judged together.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from ..schema import Chunk, Modality, ScoredChunk
 from ..textutil import (
@@ -417,7 +417,7 @@ def chunk_relevance_map(scored: list[ScoredChunk]) -> dict[str, float]:
     lo, hi = min(raw), max(raw)
     span = (hi - lo) or 1.0
     out: dict[str, float] = {}
-    for cand, score in zip(scored, raw):
+    for cand, score in zip(scored, raw, strict=False):
         out[cand.chunk.chunk_id] = (score - lo) / span
     return out
 
@@ -449,7 +449,7 @@ def score_units(
         pairs = [(question, unit.context or unit.phrase or unit.text) for unit in units]
         raw = cross_encoder.predict(pairs, batch_size=32, show_progress_bar=False)
         ce_raw = [float(s) for s in raw]
-        for unit, score in zip(units, ce_raw):
+        for unit, score in zip(units, ce_raw, strict=False):
             unit.ce_score = score
 
     # Normalise the cross-encoder inside each modality.
@@ -553,15 +553,6 @@ def score_units(
         unit.score = score
 
     return sorted(units, key=lambda u: -u.score)
-
-
-def _minmax(values: list[float]) -> list[float]:
-    if not values:
-        return []
-    lo, hi = min(values), max(values)
-    if abs(hi - lo) < 1e-9:
-        return [0.5 for _ in values]
-    return [(v - lo) / (hi - lo) for v in values]
 
 
 def pick_answer_value(unit: EvidenceUnit) -> str:

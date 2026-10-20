@@ -144,7 +144,7 @@ def sentences(text: str) -> list[str]:
 _ABBREVIATIONS = {
     "in", "w", "c", "lb", "lbs", "oz", "ft", "no", "fig", "sec", "vol", "amp",
     "psi", "cfm", "deg", "hr", "min", "approx", "dr", "mr", "ms", "jr", "sr",
-    "inc", "ltd", "co", "etc", "max", "min", "mfg", "gal", "sq", "sp",
+    "inc", "ltd", "co", "etc", "max", "mfg", "gal", "sq", "sp",
 }
 
 _NUMBERED_LABEL = re.compile(r"(figure|table|fig|step|section|note|item)\s*\d+$", re.I)

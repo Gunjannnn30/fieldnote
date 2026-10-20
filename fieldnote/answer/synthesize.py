@@ -17,14 +17,17 @@ Two implementations:
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
 
 from ..config import settings
-from ..schema import Answer, Citation, Modality, ScoredChunk
+from ..schema import Answer, Modality, ScoredChunk
 from .citations import build_citations
 from .units import EvidenceUnit, build_units, chunk_relevance_map, pick_answer_value, score_units
 
-UNANSWERABLE_THRESHOLD = -6.0
+# A unit score below this means no fragment in the corpus supports an answer.
+# The scores are roughly in [-1, 1.5]: the lexical signals are bounded, and
+# the "-1" penalty for a fragment that states no value is the main negative
+# term.
+UNANSWERABLE_THRESHOLD = 0.0
 
 _VISUAL_HINTS = ("chart", "graph", "curve", "diagram", "schematic", "photo", "image",
                   "picture", "label", "plate", "figure", "shown", "display")
@@ -50,6 +53,7 @@ class Synthesizer:
         scored: list[ScoredChunk],
         *,
         latency: dict[str, float] | None = None,
+        units: list | None = None,
     ) -> Answer:
         raise NotImplementedError
 
@@ -124,7 +128,6 @@ class ExtractiveSynthesizer(Synthesizer):
     @staticmethod
     def _score_units(question: str, scored: list[ScoredChunk]) -> list:
         from ..encode.registry import get_cross_encoder
-        from .units import build_units, chunk_relevance_map, score_units
 
         units = build_units(scored)
         return score_units(

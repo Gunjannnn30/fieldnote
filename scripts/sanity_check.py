@@ -61,7 +61,6 @@ def audio_check() -> None:
     items = [(call, 0.0, 6.0), (call, 45.0, 52.0), (call, 24.0, 30.0)]
     audio = enc.encode(items)
     texts = enc.encode_query.__self__  # keep the encoder alive
-    from fieldnote.encode.audio import AudioEncoder
 
     enc_text = enc.model.get_text_features
     import torch

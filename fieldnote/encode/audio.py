@@ -98,7 +98,7 @@ class AudioEncoder:
         return feats.detach().cpu().numpy().astype(np.float32)
 
 
-def _as_tensor(out) -> "torch.Tensor":
+def _as_tensor(out) -> torch.Tensor:
     """transformers >=5 returns a ModelOutput from get_*_features, not a tensor."""
     import torch
 

@@ -38,7 +38,6 @@ from dataclasses import dataclass, field
 
 import numpy as np
 
-from ..config import settings
 from ..schema import Modality, ScoredChunk
 from ..textutil import content_tokens, question_tokens
 
@@ -140,7 +139,7 @@ def rerank(
         model = get_cross_encoder()
         pairs = [(question, text_proxy(c.chunk)) for c in candidates]
         raw = model.predict(pairs, batch_size=16, show_progress_bar=False)
-        for cand, score in zip(candidates, raw):
+        for cand, score in zip(candidates, raw, strict=False):
             signals.ce[cand.chunk.chunk_id] = float(score)
 
     # ---------------- joint-space scores --------------------------------
@@ -231,7 +230,7 @@ def _joint_scores(
                     sims.append(0.0)
                 else:
                     sims.append(float(np.dot(vec, query_vec)))
-            for cand, sim in zip(subset, sims):
+            for cand, sim in zip(subset, sims, strict=False):
                 out[cand.chunk.chunk_id] = sim
             continue
 
@@ -242,11 +241,11 @@ def _joint_scores(
             enc = get_image_encoder()
             qv = enc.encode_query(question)
             paths = [c.chunk.crop_path for c in subset]
-            valid = [(c, p) for c, p in zip(subset, paths) if p]
+            valid = [(c, p) for c, p in zip(subset, paths, strict=False) if p]
             if not valid:
                 continue
             vecs = enc.encode([p for _c, p in valid])
-            for (cand, _p), sim in zip(valid, vecs @ qv):
+            for (cand, _p), sim in zip(valid, vecs @ qv, strict=False):
                 out[cand.chunk.chunk_id] = float(sim)
         else:
             from ..encode.registry import get_audio_encoder
@@ -257,7 +256,7 @@ def _joint_scores(
                 (c.chunk.audio_path, c.chunk.start_sec, c.chunk.end_sec) for c in subset
             ]
             vecs = enc.encode(items)
-            for cand, sim in zip(subset, vecs @ qv):
+            for cand, sim in zip(subset, vecs @ qv, strict=False):
                 out[cand.chunk.chunk_id] = float(sim)
 
     return out

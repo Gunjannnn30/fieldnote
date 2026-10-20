@@ -24,7 +24,7 @@ from pathlib import Path
 import fitz
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
-from .spec import CALLS, FIGURE_FACTS, MANUALS, Figure
+from .spec import CALLS, FIGURE_FACTS, Figure
 
 # ---------------------------------------------------------------------------
 # matplotlib helpers
@@ -200,7 +200,7 @@ def render_capacity_table(params: dict) -> Image.Image:
     table.auto_set_font_size(False)
     table.set_fontsize(17)
     table.scale(1.3, 2.4)
-    for (row, col), cell in table.get_celld().items():
+    for (row, _col), cell in table.get_celld().items():
         cell.set_edgecolor("#333333")
         cell.set_linewidth(1.4)
         if row == 0:
@@ -330,7 +330,6 @@ def render_photo_nameplate(params: dict) -> Image.Image:
 
 def render_photo_gauge(params: dict) -> Image.Image:
     """A job-site photo of a manifold gauge reading."""
-    import numpy as np
 
     w, h = 1000, 1000
     img = Image.new("RGB", (w, h), (44, 46, 50))
@@ -594,7 +593,6 @@ def synthesize_call(script: list[tuple[str, str]], out_path: Path) -> bool:
 
         # concatenate with a short silence between speakers
         import numpy as np
-        import wave  # noqa: F401
 
         from ..audio_util import read_wav, write_wav
 

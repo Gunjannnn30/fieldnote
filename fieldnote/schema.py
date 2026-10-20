@@ -70,7 +70,7 @@ class BBox:
         return {"x0": self.x0, "y0": self.y0, "x1": self.x1, "y1": self.y1}
 
     @staticmethod
-    def from_dict(d: dict[str, Any]) -> "BBox":
+    def from_dict(d: dict[str, Any]) -> BBox:
         return BBox(float(d["x0"]), float(d["y0"]), float(d["x1"]), float(d["y1"]))
 
 
@@ -111,7 +111,7 @@ class Chunk:
         return d
 
     @staticmethod
-    def from_dict(d: dict[str, Any]) -> "Chunk":
+    def from_dict(d: dict[str, Any]) -> Chunk:
         d = dict(d)
         d["modality"] = Modality(d["modality"])
         d["source_kind"] = SourceKind(d["source_kind"])

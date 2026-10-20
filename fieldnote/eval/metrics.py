@@ -20,7 +20,7 @@ import re
 import statistics
 from dataclasses import dataclass, field
 
-from ..textutil import content_tokens, normalize
+from ..textutil import content_tokens
 
 # ---------------------------------------------------------------------------
 # number words

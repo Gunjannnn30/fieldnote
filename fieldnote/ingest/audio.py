@@ -12,8 +12,6 @@ import re
 from dataclasses import dataclass
 from pathlib import Path
 
-import numpy as np
-
 from ..audio_util import read_wav, resample
 from ..config import settings
 from ..schema import Chunk, Modality, SourceKind
@@ -179,7 +177,3 @@ def ingest_audio(
 
 def transcription_text(segments: list[TranscriptSegment]) -> str:
     return " ".join(s.text for s in segments)
-
-
-def _silence(seconds: float, sr: int = WHISPER_SR) -> np.ndarray:
-    return np.zeros(int(seconds * sr), dtype=np.float32)

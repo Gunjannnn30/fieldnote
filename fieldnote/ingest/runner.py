@@ -11,7 +11,7 @@ import json
 from pathlib import Path
 
 from ..config import settings
-from ..schema import Chunk, SourceKind
+from ..schema import Chunk
 from .audio import ingest_audio
 from .images import ingest_image
 from .pdf import ingest_pdf

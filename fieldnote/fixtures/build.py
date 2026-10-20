@@ -21,7 +21,6 @@ import shutil
 from pathlib import Path
 
 from ..config import settings
-from ..textutil import normalize
 from .render import render_calls, render_figure, render_manual
 from .spec import AUDIO_FACTS, FIGURE_FACTS, MANUALS, TEXT_FACTS
 

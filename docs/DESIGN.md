@@ -54,6 +54,9 @@ This is not a free upgrade, and pretending otherwise would be dishonest:
 | OCR / VLM at query time | no | usually yes |
 | preserves numbers on charts | **no** | yes |
 
+The measured cost on this corpus, CPU-only, 8 cores: p95 of 2.7 s end to end
+at k=20, against a 6 s budget. The early-fusion version is roughly a second
+faster, and answers none of the 15 picture-only questions.
 Fieldnote pays the extra index, the extra query encoders and the fusion step,
 because the numbers are the product. A technician does not need a
 description of a curve; they need the 385.
@@ -310,7 +313,7 @@ OCR - rather than to loosen the rule, and to keep the rule strict.
 **Latency was 28 seconds.** The reranker was re-encoding all 44 image crops
 and 19 audio clips on every question, when their vectors were already in the
 index. Dotting the stored vector with the stored query vector instead took the
-p95 from 17 s to 2 s. The other half of the problem was running the
+p95 from 17 s to under 3 s. The other half of the problem was running the
 cross-encoder over 150 fused candidates; a shortlist of 30 does the same job.
 
 ---

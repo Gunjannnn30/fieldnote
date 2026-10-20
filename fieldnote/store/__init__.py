@@ -4,12 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import numpy as np
-
 from ..config import settings
 from ..encode.registry import get_audio_encoder, get_image_encoder, get_text_encoder
 from ..schema import Chunk, Modality
-from .base import IndexedRecord, MultiSpaceStore, SPACE_FOR_MODALITY
+from .base import SPACE_FOR_MODALITY, IndexedRecord, MultiSpaceStore
 
 SPACE_DIMS = {"text": 384, "image": 512, "audio": 512}
 
@@ -62,14 +60,14 @@ def encode_chunks(chunks: list[Chunk]) -> list[IndexedRecord]:
     if lexical:
         enc = get_text_encoder()
         vectors = enc.encode([c.text for c in lexical])
-        for chunk, vec in zip(lexical, vectors):
+        for chunk, vec in zip(lexical, vectors, strict=False):
             records.append(IndexedRecord(chunk=chunk, space="text", vector=vec))
 
     image_chunks = [c for c in chunks if c.modality is Modality.IMAGE and c.crop_path]
     if image_chunks:
         enc = get_image_encoder()
         vectors = enc.encode([c.crop_path for c in image_chunks])  # type: ignore[list-item]
-        for chunk, vec in zip(image_chunks, vectors):
+        for chunk, vec in zip(image_chunks, vectors, strict=False):
             records.append(IndexedRecord(chunk=chunk, space="image", vector=vec))
 
     if audio_chunks:
@@ -77,7 +75,7 @@ def encode_chunks(chunks: list[Chunk]) -> list[IndexedRecord]:
         vectors = enc.encode(
             [(c.audio_path, c.start_sec, c.end_sec) for c in audio_chunks]  # type: ignore[misc]
         )
-        for chunk, vec in zip(audio_chunks, vectors):
+        for chunk, vec in zip(audio_chunks, vectors, strict=False):
             records.append(IndexedRecord(chunk=chunk, space="audio", vector=vec))
 
     return records

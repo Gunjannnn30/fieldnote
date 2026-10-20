@@ -8,8 +8,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fieldnote.config import settings  # noqa: E402
-from fieldnote.encode.registry import get_cross_encoder, get_image_encoder, get_audio_encoder  # noqa: E402
+from fieldnote.encode.registry import (  # noqa: E402
+    get_audio_encoder,
+    get_cross_encoder,
+    get_image_encoder,
+)
 
 
 def timeit(label: str, fn):

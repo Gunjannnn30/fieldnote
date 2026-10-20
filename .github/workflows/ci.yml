@@ -1,0 +1,71 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  fast:
+    name: lint and unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: lint
+        run: ruff check fieldnote tests scripts
+
+      - name: unit tests
+        run: pytest -q -m "not slow"
+
+  full:
+    name: end-to-end eval
+    runs-on: ubuntu-latest
+    # The full run needs six models (~2 GB) and renders a synthetic corpus.
+    # It is the slow one, so it only runs when asked for.
+    if: github.event_name == 'workflow_dispatch'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: download models
+        run: python scripts/download_models.py
+
+      - name: build corpus and ingest
+        run: |
+          fieldnote build
+          fieldnote ingest
+          fieldnote index
+
+      - name: check the fixtures are honest
+        run: fieldnote verify
+
+      - name: integration tests
+        run: pytest -q -m slow
+
+      - name: eval
+        run: fieldnote eval
+
+      - name: publish the report
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-report
+          path: data/artifacts/eval_report.md

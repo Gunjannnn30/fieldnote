@@ -9,17 +9,17 @@ from __future__ import annotations
 
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 from ..answer.synthesize import Synthesizer, build_synthesizer
 from ..baseline.caption_only import build_caption_baseline
 from ..config import settings
 from ..retrieve.pipeline import Retriever
-from ..schema import Chunk, Modality
-from ..store.base import MultiSpaceStore
+from ..schema import Chunk
 from ..store import build_store, encode_chunks
 from .dataset import EvalQuestion, build_eval_set, picture_only, text_only, verify_unanswerable
-from .metrics import Grade, latency_stats, grade
+from .metrics import Grade, grade, latency_stats
 
 
 @dataclass
@@ -150,7 +150,12 @@ def _warm_models() -> None:
     A cold model load is ten seconds. That belongs to start-up, not to the
     first technician's question.
     """
-    from ..encode.registry import get_audio_encoder, get_cross_encoder, get_image_encoder, get_text_encoder
+    from ..encode.registry import (
+        get_audio_encoder,
+        get_cross_encoder,
+        get_image_encoder,
+        get_text_encoder,
+    )
 
     get_text_encoder()
     get_image_encoder()
@@ -217,6 +222,15 @@ def run_system(
         top = retrieval.candidates[0] if retrieval.candidates else None
         citations = answer.citations
 
+        # The *effective* source modality. A caption chunk is a text chunk, but
+        # it is a caption of a picture - and the whole point of the comparison
+        # is that the baseline gets its image-derived answers through text.
+        top_modality = None
+        if top is not None:
+            top_modality = top.chunk.metadata.get(
+                "original_modality", top.chunk.modality.value
+            )
+
         page_correct = False
         for cit in citations:
             if q.expected_source_id and cit.source_id == q.expected_source_id:
@@ -235,7 +249,7 @@ def run_system(
                 latency_ms=latency_ms,
                 top_source_id=top.chunk.source_id if top else None,
                 top_page=top.chunk.page if top else None,
-                top_modality=top.chunk.modality.value if top else None,
+                top_modality=top_modality,
                 citation_count=len(citations),
                 citation_has_page=any(c.page is not None for c in citations),
                 citation_has_crop=any(c.crop_path for c in citations),
@@ -286,8 +300,16 @@ def run_full_eval(
     questions = build_eval_set()
 
     fieldnote = build_fieldnote_system(chunks, backend=backend, db_path=db_path, synthesis=synthesis)
+
+    # The baseline gets its own index. Sharing a database would let the
+    # baseline's caption chunks land inside Fieldnote's text space, and the
+    # comparison would stop meaning anything.
+    baseline_db = None
+    if db_path:
+        path = Path(db_path)
+        baseline_db = str(path.with_name(path.stem + "_baseline" + path.suffix))
     baseline_system, baseline_chunk_list = build_baseline_system(
-        chunks, backend=backend, db_path=db_path, synthesis=synthesis
+        chunks, backend=backend, db_path=baseline_db, synthesis=synthesis
     )
 
     fieldnote_result = run_system(fieldnote, questions, k=k)

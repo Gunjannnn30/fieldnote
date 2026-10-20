@@ -42,8 +42,8 @@ CPU-only, 8 cores, no GPU.
 
 | latency (ms, end to end) | p50 | p95 | p99 | max |
 |---|---|---|---|---|
-| fieldnote | 1607 | **1986** | 2206 | 2206 |
-| caption-only baseline | 1275 | 2506 | 30087 | 30087 |
+| fieldnote | 2223 | **2699** | 3189 | 3189 |
+| caption-only baseline | 1800 | 3024 | 4287 | 4287 |
 
 | citation compliance | fieldnote | caption-only baseline |
 |---|---|---|
@@ -51,11 +51,11 @@ CPU-only, 8 cores, no GPU.
 | answers carrying a page number | 36 / 40 | 40 / 40 |
 | citation points at the right page | 90.0% | 87.5% |
 
-| modality that supplied the winning evidence | fieldnote | baseline |
+| source modality of the winning evidence | fieldnote | caption-only baseline |
 |---|---|---|
-| image | **11** | 0 |
+| image | **11** | 2 |
 | audio | 5 | 6 |
-| text | 24 | 34 |
+| text | 24 | 32 |
 
 The four answers without a page number are the job-site photos, which have
 no page to cite. Everything else points at a page and a rectangle.
@@ -80,6 +80,10 @@ caption says "a graph with a line..." and the question says "pressure-
 temperature curve", so the retriever finds it. It just cannot read the number
 off it. That is the whole argument in one number: **retrieval is not the
 problem, the lossy step in the middle is.**
+
+Note the modality table above. The baseline's winning evidence came from a
+picture 2 times and from prose 32 times - but in the baseline, a "text" chunk
+can be a caption of a picture. That is the costume.
 
 ---
 
@@ -226,10 +230,9 @@ system. Both checks fail the build loudly.
 - The corpus is synthetic. The system is real, but the *numbers* above are
   measured on a corpus we generated, and a real corpus of 300 scanned manuals
   will be harder - noisier OCR, worse figure detection, more languages.
-- Latency is measured on 8 CPU cores. The p95 of 2.0 s is under the 6 s gate
-  with a lot of headroom; the VLM synthesiser path is far slower and is not
-  what the gate is measured against.
-- The answer synthesiser is extractive by default: it picks the best-supported
+- Latency is measured on 8 CPU cores. The p95 of 2.7 s is under the 6 s gate
+  with headroom to spare; the VLM synthesiser path is far slower and is not
+  what the gate is measured against.- The answer synthesiser is extractive by default: it picks the best-supported
   fragment and states it. It does not write prose. That is deliberate for a
   field tool, where a number that can be traced beats a paragraph that reads
   well, and it is what makes the citations meaningful.
@@ -264,6 +267,12 @@ fieldnote/
   fixtures/            the synthetic corpus and its self-checks
   serve/               FastAPI app
   cli.py               fieldnote build | ingest | index | ask | eval | serve
+scripts/
+  download_models.py   pre-fetch every model
+  verify_fixtures.py   the two honesty checks
+  run_eval.py          the eval, without the CLI
+  debug_query.py       trace one query through every stage
+  sanity_check.py      confirm the joint spaces actually line up
 ```
 
 ## Licence

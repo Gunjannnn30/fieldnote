@@ -221,7 +221,7 @@ class Retriever:
         """
         keep: dict[str, ScoredChunk] = {}
 
-        for space, hits in per_space.items():
+        for _space, hits in per_space.items():
             for record, _score in hits[: self.shortlist_per_space]:
                 chunk_id = record.chunk.chunk_id
                 if chunk_id not in keep:

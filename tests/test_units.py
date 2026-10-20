@@ -21,13 +21,12 @@ from fieldnote.answer.units import (
     question_focus,
     wants_a_value,
 )
-from fieldnote.eval.metrics import canonical, contains_answer, grade, latency_stats
+from fieldnote.eval.metrics import contains_answer, grade, latency_stats
 from fieldnote.retrieve.fuse import fuse
 from fieldnote.schema import BBox, Chunk, Modality, SourceKind
 from fieldnote.store.base import IndexedRecord
 from fieldnote.textutil import sentences
 from fieldnote.vision.demangle import demangle
-
 
 # ---------------------------------------------------------------------------
 # Sentence splitting

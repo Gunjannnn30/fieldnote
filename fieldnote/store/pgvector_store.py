@@ -94,13 +94,13 @@ class PgVectorSpaceStore:
             if want is None:
                 continue
             if isinstance(want, (list, tuple, set)):
-                clauses.append(f"payload ->> %s = ANY(%s)")
+                clauses.append("payload ->> %s = ANY(%s)")
                 clause_params.extend([key, list(want)])
             elif isinstance(want, str) and want.startswith("contains:"):
                 clauses.append("payload ->> %s ILIKE %s")
                 clause_params.extend([key, f"%{want.split(':', 1)[1]}%"])
             else:
-                clauses.append(f"payload ->> %s = %s")
+                clauses.append("payload ->> %s = %s")
                 clause_params.extend([key, want])
 
         query_vec = np.asarray(vector, dtype=np.float32)

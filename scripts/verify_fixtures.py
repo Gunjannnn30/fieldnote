@@ -21,7 +21,6 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from fieldnote.config import settings  # noqa: E402
 from fieldnote.fixtures.build import check_collisions, verify_figure_answers  # noqa: E402
 from fieldnote.ingest import ingest_corpus  # noqa: E402
 
