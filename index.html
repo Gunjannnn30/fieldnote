@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fieldnote - opening...</title>
+<style>
+  body { margin:0; height:100vh; display:grid; place-items:center;
+         background:#0d1117; color:#e8eef5;
+         font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; }
+  .box { text-align:center; max-width:34rem; padding:24px; }
+  h1 { font-size:20px; margin:0 0 10px; font-weight:640; }
+  p { color:#9aa7b4; margin:0 0 16px; font-size:14px; }
+  a { color:#4aa8ff; }
+  .dot { display:inline-block; width:10px; height:10px; border-radius:50%;
+         border:2px solid #262f3a; border-top-color:#4aa8ff;
+         animation:s .8s linear infinite; vertical-align:-1px; }
+  @keyframes s { to { transform: rotate(360deg); } }
+  #direct { margin-top:14px; font-size:13px; }
+  code { font-family:ui-monospace,Menlo,Consolas,monospace; color:#4aa8ff; }
+</style>
+</head>
+<body>
+<div class="box">
+  <h1>Opening Fieldnote...</h1>
+  <p><span class="dot"></span> Taking you to the live service.</p>
+  <p id="direct"></p>
+</div>
+<script>
+// The current address lives in a gist, so it can change without a rebuild.
+const SOURCES = ["https://gist.githubusercontent.com/Gunjannnn30/03e2e9d13a5f596a4046d7fbfed7809b/raw/089b3a1cb00537f125e22d9243e5c42c535fce55/live.json"];
+
+(async () => {
+  for (const url of SOURCES) {
+    try {
+      const res = await fetch(url + "?t=" + Date.now(), { cache: "no-store" });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const target = (data && (data.url || data.live)) || null;
+      if (target && /^https:\/\//.test(target)) {
+        document.getElementById("direct").innerHTML =
+          'Taking you to <code>' + target + '</code> &middot; <a href="' + target + '">open now</a>';
+        window.location.replace(target);
+        return;
+      }
+    } catch (e) { /* try the next source */ }
+  }
+  document.getElementById("direct").innerHTML =
+    'The live address is unavailable right now. Please try again in a moment.';
+})();
+</script>
+</body>
+</html>
