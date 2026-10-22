@@ -73,9 +73,14 @@ const SOURCES = __SOURCES__;
       const data = await res.json();
       const target = (data && (data.url || data.live)) || null;
       if (target && /^https:\/\//.test(target)) {
+        // Carry the question across the redirect.
+        const full = target + window.location.search + window.location.hash;
         document.getElementById("direct").innerHTML =
-          'Taking you to <code>' + target + '</code> &middot; <a href="' + target + '">open now</a>';
-        window.location.replace(target);
+          'Taking you to <code>' + full + '</code> &middot; <a href="' + full + '">open now</a>';
+        // ?stay=1 shows where it would have gone instead of going there.
+        if (!/[?&]stay=1/.test(window.location.search)) {
+          window.location.replace(full);
+        }
         return;
       }
     } catch (e) { /* try the next source */ }
