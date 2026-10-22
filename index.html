@@ -42,7 +42,10 @@ const SOURCES = ["https://gist.githubusercontent.com/Gunjannnn30/03e2e9d13a5f596
         const full = target + window.location.search + window.location.hash;
         document.getElementById("direct").innerHTML =
           'Taking you to <code>' + full + '</code> &middot; <a href="' + full + '">open now</a>';
-        window.location.replace(full);
+        // ?stay=1 shows where it would have gone instead of going there.
+        if (!/[?&]stay=1/.test(window.location.search)) {
+          window.location.replace(full);
+        }
         return;
       }
     } catch (e) { /* try the next source */ }
