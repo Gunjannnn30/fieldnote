@@ -214,11 +214,18 @@ class Answer:
     answerable: bool = True
     unanswerable_reason: str | None = None
     trace: Trace = field(default_factory=Trace)
+    # Plain-language layer, so somebody who does not speak HVAC can read it.
+    explanation: str = ""
+    headline: str = ""
+    glossary: list[tuple[str, str]] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "question": self.question,
             "answer": self.answer,
+            "explanation": self.explanation,
+            "headline": self.headline,
+            "glossary": [{"term": t, "meaning": m} for t, m in self.glossary],
             "citations": [c.to_dict() for c in self.citations],
             "modality_hits": self.modality_hits,
             "latency_ms": self.latency_ms,

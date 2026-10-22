@@ -55,6 +55,9 @@ class CitationPayload(BaseModel):
 class AskResponse(BaseModel):
     question: str
     answer: str
+    explanation: str = ""
+    headline: str = ""
+    glossary: list[dict[str, str]] = Field(default_factory=list)
     answerable: bool
     citations: list[CitationPayload]
     modality_hits: dict[str, int]
@@ -171,6 +174,9 @@ def create_app(backend: str | None = None) -> FastAPI:
         return AskResponse(
             question=req.question,
             answer=answer.answer,
+            explanation=answer.explanation,
+            headline=answer.headline,
+            glossary=[{"term": t, "meaning": m} for t, m in answer.glossary],
             answerable=answer.answerable,
             citations=_to_payload(answer, req.include_crops),
             modality_hits=answer.modality_hits,

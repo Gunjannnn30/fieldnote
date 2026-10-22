@@ -145,8 +145,29 @@
     font-weight: 620; color: #fff;
   }
   .answer-value .val { color: var(--blue); }
-  .answer-note { color: var(--ink-2); font-size: 14.5px; margin-top: 10px; }
-  .answer-warn { color: var(--amber); font-size: 14.5px; margin-top: 10px; }
+  .answer-plain {
+    margin-top: 12px; padding: 12px 14px; background: var(--bg-2);
+    border: 1px solid var(--line); border-left: 3px solid var(--blue);
+    border-radius: 0 var(--r-sm) var(--r-sm) 0; color: var(--ink-2);
+    font-size: 15px; line-height: 1.55;
+  }
+  .answer-plain b { color: var(--ink); font-weight: 600; }
+  .answer-note { color: var(--amber); font-size: 14.5px; margin-top: 10px; }
+
+  .terms { margin-top: 14px; }
+  .terms .t {
+    display: inline-block; margin: 0 8px 8px 0; padding: 6px 11px;
+    background: var(--panel-2); border: 1px solid var(--line); border-radius: 7px;
+    font-size: 12.5px; color: var(--ink-2); cursor: help;
+  }
+  .terms .t b { color: var(--blue); font-weight: 600; }
+  .terms .t:hover { border-color: var(--line-2); color: var(--ink); }
+  .terms .defs { margin-top: 4px; }
+  .terms .def {
+    font-size: 13px; color: var(--ink-2); padding: 8px 11px; margin-top: 6px;
+    background: var(--bg-2); border: 1px solid var(--line); border-radius: 7px;
+  }
+  .terms .def b { color: var(--blue); font-weight: 600; }
 
   .metaline { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 16px; }
   .pill {
@@ -207,6 +228,27 @@
 
   .empty { color: var(--ink-3); font-size: 14px; }
 
+  .howto {
+    background: var(--panel); border: 1px solid var(--line); border-radius: var(--r);
+    padding: 14px 20px; margin-bottom: 16px;
+  }
+  .howto summary {
+    cursor: pointer; font-size: 14px; color: var(--ink-2); list-style: none;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .howto summary::-webkit-details-marker { display: none; }
+  .howto summary::before {
+    content: "+"; color: var(--blue); font-weight: 700; font-size: 15px;
+  }
+  .howto[open] summary::before { content: "−"; }
+  .howto summary:hover { color: var(--ink); }
+  .howto summary span { color: var(--ink-3); font-size: 12.5px; }
+  .howto-body { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .howto-body p { color: var(--ink-2); font-size: 14px; margin: 0 0 11px; max-width: 78ch; }
+  .howto-body p:last-child { margin-bottom: 0; }
+  .howto-body b { color: var(--ink); font-weight: 600; }
+  .howto-body i { color: var(--blue); font-style: normal; font-family: var(--mono); }
+
   /* ---------- lightbox ---------- */
   #lb {
     position: fixed; inset: 0; background: rgba(4, 6, 9, 0.93); z-index: 100;
@@ -227,6 +269,7 @@
   body.compact .examples h3 { display: none; }
   body.compact .group .label { display: none; }
   body.compact .group { margin-bottom: 7px; }
+  body.compact .howto { display: none; }
   .cite .noimg {
     padding: 22px 16px; color: var(--ink-3); font-size: 12.5px; text-align: center;
     background: repeating-linear-gradient(45deg, #0d1117, #0d1117 8px, #10151c 8px, #10151c 16px);
@@ -262,6 +305,7 @@
     </div>
     <div class="top-right">
       <div class="status" id="status-pill"><span class="dot" id="dot"></span><span id="status-text">checking…</span></div>
+      <a class="top-link" href="#howto" id="howtoLink">How it works</a>
       <a class="top-link" href="/docs">API</a>
       <a class="top-link" href="https://github.com/Gunjannnn30/fieldnote" target="_blank" rel="noopener">GitHub</a>
     </div>
@@ -270,12 +314,13 @@
 
 <div class="wrap">
   <section class="hero">
-    <h1>The answer is on the <em>page</em>, not in a paragraph.</h1>
-    <p>Search the manuals, the job photos and the recorded support calls at once. Every
-       answer comes back with the exact picture it was read from, so you can check it
-       against the page before you sign off the work.</p>
-    <p class="small">Built for commercial HVAC field service — rooftop units, pressure
-       curves, wiring diagrams, nameplates, and calls to the manufacturer's support line.</p>
+    <h1>Find the answer in the <em>manuals, photos and calls</em>.</h1>
+    <p>Type a question. Fieldnote looks through the service manuals, the job-site
+       photos and the recorded support calls at the same time, and gives you the
+       answer <b>with the picture it was read from</b> — so you can check it
+       yourself.</p>
+    <p class="small">No HVAC knowledge needed. Every term is explained where it
+       appears.</p>
   </section>
 
   <div class="askbox">
@@ -298,20 +343,45 @@
       <button id="copy" class="copy" type="button">Copy</button>
     </h2>
     <div class="answer-value" id="answer"></div>
+    <div class="answer-plain hide" id="answerPlain"></div>
     <div class="answer-note hide" id="answerNote"></div>
     <div class="metaline" id="meta"></div>
+    <div class="terms hide" id="terms"></div>
   </div>
 
   <div class="card hide" id="traceCard">
-    <h2>How this was found</h2>
+    <h2>How we found it</h2>
     <div class="pipeline" id="pipeline"></div>
     <div class="winner" id="winner"></div>
   </div>
 
   <div class="card hide" id="citeCard">
-    <h2>Evidence <span class="sub">— the picture the answer was read from</span></h2>
+    <h2>The evidence <span class="sub">— click a picture to enlarge it</span></h2>
     <div class="cites" id="cites"></div>
   </div>
+
+  <details class="howto" id="howto">
+    <summary>How does this work? <span>(for the curious)</span></summary>
+    <div class="howto-body">
+      <p><b>Three searchers, one question.</b> When you ask something, Fieldnote
+      searches the <b>manuals and transcripts</b> (as words), the <b>pictures</b>
+      (as pixels, not as descriptions) and the <b>recorded calls</b> (as sound)
+      at the same time. A typed question reaches the picture searcher because
+      the same model that reads pictures also understands text.</p>
+      <p><b>Why not just describe the pictures?</b> Because a description of a
+      pressure graph says "a line going up" — and the number the technician
+      needs, <i>385</i>, is not in it. The number is destroyed when the picture
+      is described, long before anyone asks a question. Here the picture stays
+      a picture until the answer has been read out of it.</p>
+      <p><b>What "lines read" means.</b> The answer is not a whole page. It is
+      one line - a sentence from a manual, a label on a chart, a line from a
+      phone call. Those lines are pulled out of the best-matching pages,
+      re-ranked, and the winner becomes the answer.</p>
+      <p><b>Why there is a picture next to the answer.</b> So you do not have to
+      take the system's word for it. The crop is the exact region the answer
+      was read from; "full page" shows you where that region sits on the page.</p>
+    </div>
+  </details>
 
   <footer>
     <span>Fieldnote — multimodal retrieval for HVAC field service.</span>
@@ -377,6 +447,15 @@ function setCompact(on) {
     });
   });
 }
+
+/* ---------------- the "how it works" panel ---------------- */
+$("howtoLink").addEventListener("click", e => {
+  e.preventDefault();
+  const panel = $("howto");
+  document.body.classList.remove("compact");
+  panel.open = true;
+  panel.scrollIntoView({ behavior: "smooth", block: "center" });
+});
 
 /* ---------------- copy the answer ---------------- */
 $("copy").addEventListener("click", async () => {
@@ -452,35 +531,67 @@ function render(d) {
 
   const w = d.trace && d.trace.winner || {};
   $("answer").textContent = d.answer || "—";
-  $("answerSource").textContent = w.modality ? `· answered from ${w.modality} evidence` : "";
+  $("answerSource").textContent = w.modality
+    ? `· read from ${w.modality === "image" ? "a picture" : w.modality === "audio" ? "a recording" : "the text"}`
+    : "";
+
+  // The plain-language version, for somebody who does not speak HVAC.
+  const plain = $("answerPlain");
+  if (d.explanation) {
+    plain.innerHTML = `<b>In plain English:</b> ${esc(d.explanation)}`;
+    plain.classList.remove("hide");
+  } else plain.classList.add("hide");
 
   const note = $("answerNote");
   if (d.answerable === false) {
-    note.textContent = "No evidence in the corpus supports an answer to this question.";
-    note.className = "answer-warn";
+    note.textContent = "Nothing in the manuals, photos or calls answers this question. "
+                      + "Try different wording, or check that the document is in the index.";
+    note.className = "answer-note";
     note.classList.remove("hide");
   } else note.classList.add("hide");
+
+  // Vocabulary, with a tooltip for each term.
+  const terms = $("terms");
+  if (d.glossary && d.glossary.length) {
+    terms.innerHTML =
+      d.glossary.slice(0, 8).map((g, i) =>
+        `<span class="t" data-i="${i}" title="${esc(g.meaning)}"><b>${esc(g.term)}</b> &nbsp;what is this?</span>`
+      ).join("") +
+      `<div class="defs" id="defs"></div>`;
+    terms.classList.remove("hide");
+    terms.querySelectorAll(".t").forEach(t => {
+      t.addEventListener("click", () => {
+        const g = d.glossary[Number(t.dataset.i)];
+        const defs = $("defs");
+        const line = `<div class="def"><b>${esc(g.term)}</b> — ${esc(g.meaning)}</div>`;
+        const open = defs.dataset.open === t.dataset.i;
+        defs.innerHTML = open ? "" : line;
+        defs.dataset.open = open ? "" : t.dataset.i;
+      });
+    });
+  } else terms.classList.add("hide");
 
   const pills = [];
   pills.push(`<span class="pill"><b>${Math.round(d.latency_ms)}</b> ms</span>`);
   for (const [m, n] of Object.entries(d.modality_hits || {})) {
     if (!n) continue;
     const cls = m === "image" ? "a" : m === "audio" ? "g" : "";
-    pills.push(`<span class="pill ${cls}">${esc(m)} candidates <b>${n}</b></span>`);
+    const label = m === "image" ? "pictures" : m === "audio" ? "recordings" : "documents";
+    pills.push(`<span class="pill ${cls}">${n} ${label}</span>`);
   }
   if (w.score != null) pills.push(`<span class="pill">confidence <b>${Number(w.score).toFixed(2)}</b></span>`);
   $("meta").innerHTML = pills.join("");
 
-  /* ---- trace ---- */
+  /* ---- trace, in plain language ---- */
   const t = d.trace || {};
   const spaces = t.spaces || {};
   const stages = [
-    { n: spaces.text ?? 0,  l: "Text hits",    s: "manuals + transcripts" },
-    { n: spaces.image ?? 0, l: "Picture hits", s: "CLIP over pixels" },
-    { n: spaces.audio ?? 0, l: "Audio hits",   s: "CLAP over waveform" },
-    { n: t.fused ?? 0,     l: "Fused",        s: "reciprocal rank fusion" },
-    { n: t.shortlist ?? 0, l: "Reranked",     s: "cross-encoder" },
-    { n: t.units ?? 0,     l: "Units read",   s: "sentences & OCR" }
+    { n: spaces.text ?? 0,  l: "Words found",   s: "in manuals and transcripts" },
+    { n: spaces.image ?? 0, l: "Pictures found",s: "charts, diagrams, photos" },
+    { n: spaces.audio ?? 0, l: "Calls found",  s: "recorded phone calls" },
+    { n: t.fused ?? 0,     l: "Combined",     s: "the best of all three" },
+    { n: t.shortlist ?? 0, l: "Best matches", s: "re-checked by relevance" },
+    { n: t.units ?? 0,     l: "Lines read",   s: "sentences and labels" }
   ];
   $("pipeline").innerHTML = stages.map(s =>
     `<div class="stage"><div class="n">${s.n}</div><div class="l">${s.l}</div><div class="s">${s.s}</div></div>`
@@ -488,10 +599,10 @@ function render(d) {
 
   if (w.text) {
     $("winner").innerHTML = `
-      <div class="wl">Winning fragment</div>
+      <div class="wl">The exact words the answer came from</div>
       <div class="quote">${esc(w.text)}</div>
       <div class="where">${esc(w.doc_title || "")}${w.page ? " · page " + w.page : ""}${w.region ? " · " + w.region : ""}
-        ${w.ce_score != null ? " · cross-encoder " + Number(w.ce_score).toFixed(2) : ""}</div>`;
+        ${w.ce_score != null ? " · relevance " + Number(w.ce_score).toFixed(2) : ""}</div>`;
   } else $("winner").innerHTML = "";
 
   /* ---- evidence ---- */

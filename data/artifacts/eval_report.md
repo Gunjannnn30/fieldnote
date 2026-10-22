@@ -13,8 +13,8 @@
 
 | latency (ms, end to end) | p50 | p95 | p99 | mean | max |
 |---|---|---|---|---|---|
-| fieldnote | 2386.1 | 2911.0 | 2951.4 | 2284.5 | 2951.4 |
-| caption-only baseline | 1703.4 | 2868.2 | 3138.6 | 1791.6 | 3138.6 |
+| fieldnote | 1918.8 | 2387.2 | 2614.5 | 1860.8 | 2614.5 |
+| caption-only baseline | 1203.1 | 2276.2 | 2534.8 | 1273.6 | 2534.8 |
 
 
 ## 3. Citation compliance

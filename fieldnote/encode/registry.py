@@ -11,6 +11,7 @@ import functools
 from ..config import settings
 from ..schema import Modality
 from .audio import AudioEncoder
+from .cross_encoder import CrossEncoderScorer
 from .image import ImageEncoder
 from .text import TextEncoder
 
@@ -31,10 +32,10 @@ def get_audio_encoder() -> AudioEncoder:
 
 
 @functools.lru_cache(maxsize=1)
-def get_cross_encoder():
-    from sentence_transformers import CrossEncoder
+def get_cross_encoder() -> CrossEncoderScorer:
+    from .cross_encoder import CrossEncoderScorer
 
-    return CrossEncoder(settings.cross_encoder_model, device=settings.device, max_length=384)
+    return CrossEncoderScorer()
 
 
 @functools.lru_cache(maxsize=1)

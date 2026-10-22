@@ -21,6 +21,7 @@ import re
 from ..config import settings
 from ..schema import Answer, Modality, ScoredChunk, Trace
 from .citations import build_citations
+from .explain import explain, find_terms, headline
 from .units import EvidenceUnit, build_units, chunk_relevance_map, pick_answer_value, score_units
 
 # A unit score below this means no fragment in the corpus supports an answer.
@@ -138,6 +139,9 @@ class ExtractiveSynthesizer(Synthesizer):
                     "region": best.chunk.region_label,
                 }
             ),
+            explanation=explain(question, best.text, best.context),
+            headline=headline(question, best.text),
+            glossary=find_terms(f"{question} {best.text}"),
         )
 
     @staticmethod

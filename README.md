@@ -1,7 +1,7 @@
 # Fieldnote
 
-**Search the manuals, the job photos and the recorded support calls at once — and
-get the answer back with the picture it was read from.**
+**Find the answer in the manuals, the photos and the calls — and get it back
+with the picture it was read from.**
 
 [![Fieldnote](docs/images/rooftop-hvac.jpg)](docs/images/rooftop-hvac.jpg)
 <sub>Rooftop HVAC unit being craned into position. Photo: Los Angeles Air Force Base, public domain, via Wikimedia Commons.</sub>
@@ -13,14 +13,15 @@ get the answer back with the picture it was read from.**
 1. [What HVAC is, and what the work actually looks like](#1-what-hvac-is-and-what-the-work-actually-looks-like)
 2. [The problem: the answer is a picture](#2-the-problem-the-answer-is-a-picture)
 3. [What Fieldnote does](#3-what-fieldnote-does)
-4. [The results](#4-the-results)
-5. [How it works, step by step](#5-how-it-works-step-by-step)
-6. [Reading the screen](#6-reading-the-screen)
+4. [Reading the screen](#4-reading-the-screen)
+5. [The results](#5-the-results)
+6. [How it works, step by step](#6-how-it-works-step-by-step)
 7. [Run it](#7-run-it)
-8. [Deploy it with Docker](#8-deploy-it-with-docker)
-9. [How to explain this to someone else](#9-how-to-explain-this-to-someone-else)
-10. [Honest limitations](#10-honest-limitations)
-11. [Design notes, layout, tests](#11-design-notes-layout-tests)
+8. [Deploy it](#8-deploy-it)
+9. [The API](#9-the-api)
+10. [How to explain this to someone else](#10-how-to-explain-this-to-someone-else)
+11. [Honest limitations](#11-honest-limitations)
+12. [Design notes, layout, tests](#12-design-notes-layout-tests)
 
 ---
 
@@ -28,13 +29,13 @@ get the answer back with the picture it was read from.**
 
 **HVAC** stands for **Heating, Ventilation and Air Conditioning**. It is the
 trade that keeps buildings at a temperature people can work in, moves the air
-around them, and removes the humidity from it. Almost every commercial
-building you walk into runs on it, usually from equipment you never see.
+around them, and strips the moisture out of it. Almost every commercial
+building runs on it, usually from equipment you never see.
 
-The equipment splits into two halves, and this matters for the rest of the
-story:
+The equipment splits into two halves, and the split matters for everything
+that follows:
 
-| | what it is | where you find it |
+| | what it does | where you find it |
 |---|---|---|
 | **Air handling** | moves and conditions the air — filters, coils, blowers, dampers | a plant room, a mechanical room, the ceiling of an office |
 | **Refrigeration** | moves heat from inside to outside — compressors, condensers, expansion valves, refrigerant | on the roof, or in a plant room |
@@ -47,20 +48,20 @@ story:
 <sub>Left: an air handling unit. Centre: an air-cooled chiller. Right: outdoor condensing units on a rooftop. All via Wikimedia Commons — see <a href="docs/images/CREDITS.md">credits</a>.</sub>
 
 **The work** is done by field technicians, and it is harder than it looks. A
-commercial HVAC contractor might run 40 technicians, each of them driving to
-a different building every day, and none of them can memorise the service
-manual for every make of rooftop unit that their customers own. A single
-technician's week is a sequence of:
+commercial HVAC contractor might run 40 technicians, each of them driving to a
+different building every day, and none of them can memorise the service manual
+for every make of rooftop unit their customers own. A technician's week is a
+sequence of:
 
-- reading a fault on a control board and deciding what it means;
-- finding the right procedure in a 300-page manual for a unit they have never
-  seen before;
-- reading a pressure-temperature curve to work out what a gauge reading
+- reading a fault on a control board and working out what it means;
+- finding the right procedure in a 300-page manual for a machine they have
+  never seen before;
+- reading a **pressure-temperature curve** to work out what a gauge reading
   *should* be at today's outdoor temperature;
-- matching a wiring diagram to a field-wired panel with somebody else's
+- matching a **wiring diagram** to a field-wired panel with somebody else's
   workmanship in it;
-- recognising a failed part from a photograph — a bulged capacitor, a pitted
-  contactor, a corroded coil;
+- recognising a failed part from a **photograph** — a bulged capacitor, a
+  pitted contactor, a corroded coil;
 - calling the manufacturer's support line, being put on hold, and being asked
   questions they answered on the first call.
 
@@ -71,6 +72,26 @@ turn into "open the right document, find the right page, read the right number".
   <img src="docs/images/rooftop-units-brisbane.jpg" width="86%" alt="Air handling units on the roof of a large commercial building">
 </p>
 <sub>Rooftop units on a large commercial building. Photo: Kgbo, CC BY-SA 4.0, via Wikimedia Commons.</sub>
+
+### The vocabulary, in one place
+
+The interface explains these where they appear, but here they are in one list
+so the rest of this document makes sense.
+
+| term | what it actually means |
+|---|---|
+| **Rooftop unit (RTU)** | one self-contained box on the roof that does the heating, cooling and ventilation for a building |
+| **Pressure-temperature curve (P-T curve)** | the chart that tells you what pressure a refrigerant *should* be at a given temperature. If the gauge does not match the curve, something is wrong. |
+| **Cutout** | a safety switch that shuts the machine down when a limit is reached, so it cannot damage itself |
+| **High / low pressure cutout** | the high-side and low-side safety limits, usually printed on the curve |
+| **Nameplate / data plate** | the sticker on the machine with its model number, voltage and refrigerant |
+| **Superheat** | how far the refrigerant gas is above the temperature it should be boiling at |
+| **Subcooling** | how far the liquid refrigerant is below the temperature it should be condensing at |
+| **Economizer** | the part that lets cool outside air in instead of conditioning recirculated air |
+| **TXV** | thermostatic expansion valve — meters refrigerant into the evaporator |
+| **Contactor / capacitor** | the switch that starts the compressor, and the part that helps the motors start |
+| **PSI / PSIG** | pounds per square inch — how hard the refrigerant is being pushed |
+| **Fault code** | what the unit's control board displays when it thinks something is wrong |
 
 ---
 
@@ -89,8 +110,8 @@ Where is the answer? Not in a paragraph. It is in three places at once:
 | the recorded support call | which roof the unit is on, and what the technician was told to check | **two sentences of speech** |
 
 This is the shape of almost every field-service question. The knowledge is
-spread across three media, and the part that matters most — the number — lives
-in a **picture**.
+spread across three media, and the part that matters most — the number —
+lives in a **picture**.
 
 ### Why the usual approach fails
 
@@ -104,8 +125,8 @@ image  ──►  "a line graph with a blue line and a red line"  ──►  tex
 This works right up until the question needs a number. A caption of a
 pressure-temperature curve says *"a graph with a line going up"*. The question
 needs **385**. The caption does not contain 385 — and because the captioning
-happened when the document was **indexed**, nothing that happens afterwards can
-put it back. The number was destroyed before anyone asked a question.
+happened when the document was **indexed**, nothing that happens afterwards
+can put it back. The number was destroyed before anyone asked a question.
 
 That is the trap this project exists to avoid. It is a text pipeline wearing a
 costume.
@@ -117,29 +138,65 @@ costume.
 Fieldnote keeps pictures **as pictures**. It gives each kind of evidence its
 own searcher, searches all of them at once, and then reads the answer out of
 the evidence that actually contains it — handing back the picture so the
-technician can check it.
+person reading it can check it.
 
 ![The Fieldnote interface answering a question about a pressure-temperature curve](docs/images/ui-answer.png)
 
 Four things happen when you ask a question:
 
-1. **Three searchers run in parallel** — one that reads text, one that looks at
-   pixels, one that listens to waveforms. A typed question reaches all three,
-   because each model's text tower shares a vector space with its own image
-   and audio tower.
+1. **Three searchers run in parallel** — one that reads words, one that looks
+   at pixels, one that listens to waveforms. A typed question reaches all
+   three, because each model has a text side that shares a space with its own
+   picture and sound side.
 2. **The result lists are merged** with Reciprocal Rank Fusion, which only
    looks at *ranks*, so it does not care that the three searchers score on
    different scales.
-3. **A cross-encoder judges the shortlist** and then judges the individual
-   fragments inside the winners — because the sentence that says "15 minutes"
-   is the answer, and the 900-character paragraph it came from is not.
+3. **A relevance model re-checks the shortlist**, then re-checks the
+   individual lines inside the winners — because the sentence that says
+   "15 minutes" is the answer, and the 900-character block it came from is not.
 4. **The answer is read out of the pixels**, using OCR plus the layout of the
-   page, and it comes back with the page number, the cropped region and the
+   page, and it comes back with the page number, the cropped region, and the
    full page to check it against.
+
+And for anyone who does not speak HVAC, the answer comes with a **plain-English
+version** and every technical term in it is clickable.
 
 ---
 
-## 4. The results
+## 4. Reading the screen
+
+<p align="center">
+  <img src="docs/images/ui-home.png" width="92%" alt="The Fieldnote home screen">
+</p>
+
+- **The box at the top** is the whole interface. Type a question, press
+  <kbd>Enter</kbd>. Press <kbd>/</kbd> from anywhere to jump back to it.
+- **The example questions** are grouped by where the answer lives — from the
+  manuals, from the job photos, from the support calls. Click one to run it.
+- **Answer** is the value, with a **Copy** button.
+- **In plain English** is the same answer, said without the jargon: *"The unit
+  switches itself off when the refrigerant pressure reaches 385 psi. That is the
+  safety limit printed on the chart — it is there to protect the compressor
+  from damage."*
+- **The little blue chips** are the technical terms in play. Click one and it
+  explains itself: *cutout pressure — a safety switch that shuts the machine
+  down when a limit is reached*.
+- **How we found it** is the search trace in plain words: 40 words found, 40
+  pictures found, 19 calls found → 99 combined → 27 best matches → 70 lines
+  read. Below it, **the exact words the answer came from**, with the page, the
+  region and the relevance score. This is the part that answers *"why did it
+  say that?"*.
+- **The evidence** is the picture, the region and the score for each
+  candidate. Click any image to enlarge it; **full page** opens the page with
+  the cited region outlined; **raw** opens the underlying chunk including its
+  OCR text.
+- A question in the URL runs itself, so an answer can be shared as a link.
+- **How it works** (top right) opens a plain-language explanation of the
+  whole thing.
+
+---
+
+## 5. The results
 
 40 questions. 15 of them are **provably** unanswerable from text — the eval
 checks the prose, the captions and the transcripts at run time and fails if a
@@ -153,8 +210,8 @@ picture-only answer turns up in any of them. CPU only, 8 cores, no GPU.
 
 | latency (ms, end to end) | p50 | p95 | p99 | max |
 |---|---|---|---|---|
-| fieldnote | 2386 | **2911** | 2951 | 2951 |
-| caption-only baseline | 1703 | 2868 | 3139 | 3139 |
+| fieldnote | 1919 | **2387** | 2615 | 2615 |
+| caption-only baseline | 1203 | 2276 | 2535 | 2535 |
 
 | citation compliance | fieldnote | caption-only baseline |
 |---|---|---|
@@ -183,9 +240,9 @@ regenerate with `fieldnote eval`.
 
 ---
 
-## 5. How it works, step by step
+## 6. How it works, step by step
 
-### 5.1 The corpus
+### 6.1 The corpus
 
 The knowledge a contractor has looks like this:
 
@@ -210,16 +267,21 @@ fieldnote ingest    # manuals -> pages, crops, OCR, transcripts
   rectangles and table detection give the geometry, and the regions are
   classified as chart, wiring diagram, table, figure or photo. Each region
   becomes its own image chunk, and the page's prose becomes text chunks.
+  Running headers and footers are excluded, because a page number is not
+  knowledge.
 - **Photos** become image chunks, OCR'd for nameplates, gauge readings and
   fault codes.
 - **Calls** are transcribed by Whisper into timestamped segments, so a chunk
   can point at the exact second of the call it came from.
 
-### 5.2 Three encoders, three spaces
+Every chunk carries a **modality tag** and knows how to point back at its
+pixels or its audio. That is the central invariant of the whole system.
 
-| modality | encoder | space | what it is good at |
+### 6.2 Three encoders, three spaces
+
+| modality | encoder | space | good at |
 |---|---|---|---|
-| text | MiniLM | 384-d | prose, transcripts, OCR strings |
+| text | MiniLM (mean pooling) | 384-d | prose, transcripts, OCR strings |
 | image | CLIP image tower | 512-d | pixels, charts, nameplates |
 | audio | CLAP audio tower | 512-d | waveforms, acoustics |
 
@@ -235,13 +297,13 @@ the transcript in the text space. A transcript is language, not a lossy summary
 of a picture. Flattening a call to a caption would be as silly as flattening a
 chart; flattening a chart is the bug.
 
-### 5.3 Retrieval: parallel search, then fusion, then rerank
+### 6.3 Retrieval: parallel search, then fusion, then rerank
 
 ```
                  question (text)
                         │
         ┌───────────────┼───────────────┐
-   MiniLM(text)   CLIP text tower   CLAP text tower
+   MiniLM(words)   CLIP text tower   CLAP text tower
         │               │               │
    text space       image space      audio space
  (prose + tx)       (pixels)         (waveform)
@@ -250,12 +312,12 @@ chart; flattening a chart is the bug.
                         │
              Reciprocal Rank Fusion
                         │
-         cross-encoder rerank (shortlist)
+         relevance rerank (shortlist)
                         │
-        expand the best chunks into units
+        expand the best chunks into lines
       (sentences · OCR phrases · call lines)
                         │
-          cross-encoder rerank (units)
+          relevance rerank (lines)
                         │
                 answer  +  citations
 ```
@@ -266,18 +328,18 @@ scores on incomparable scales — a CLIP cosine of 0.28 and a MiniLM cosine of
 fragile and unfalsifiable. RRF only uses ranks, so it is scale-free by
 construction and has one parameter that is not fitted to the eval set.
 
-**Why rerank twice?** A cross-encoder judges a question and a passage
+**Why rerank twice?** A relevance model judges a question and a passage
 *together*, which is why it beats a bi-encoder — but it cannot be
 precomputed, so every pair it judges is paid for on every question. Judging
 30 pairs takes about a second; judging 150 takes five and buys nothing. So
-the first pass picks the right *documents*, and the second pass picks the
-right *fragment inside them*.
+the first pass picks the right *documents*, and the second picks the right
+*line inside them*.
 
-**Why expand into units?** Because the answer to "how long must the unit run
+**Why expand into lines?** Because the answer to "how long must the unit run
 before the subcooling is checked?" is the sentence that says *15 minutes*, not
 the 900-character block it came from.
 
-### 5.4 Reading the number off a chart
+### 6.4 Reading the number off a chart
 
 The picture-only questions are answered by OCR and geometry, not by a vision
 model:
@@ -299,7 +361,7 @@ model:
    state what the figure says, so it can never be the answer to a question
    about a value. Neither can a bare axis label like "300".
 
-### 5.5 The answer and its citations
+### 6.5 The answer, and its citations
 
 The answer is a fragment plus its provenance:
 
@@ -308,32 +370,25 @@ The answer is a fragment plus its provenance:
   page 11 · chart · trane ysc072 service manual · crop attached
 ```
 
-`40 / 40` answers carry a cropped image, and the `/page/{chunk_id}` endpoint
-returns the **whole page with the cited region outlined** — the view that
-settles a disagreement with a customer.
+`40 / 40` answers carry a cropped image, and `GET /page/{chunk_id}` returns
+the **whole page with the cited region outlined** — the view that settles a
+disagreement with a customer.
 
----
+### 6.6 The plain-language layer
 
-## 6. Reading the screen
+A separate module turns a fragment of HVAC documentation into a sentence a
+non-specialist can act on, by recognising what kind of value the question asked
+for and what the unit means:
 
-<p align="center">
-  <img src="docs/images/ui-home.png" width="92%" alt="The Fieldnote home screen">
-</p>
+| the question asks about | the answer says |
+|---|---|
+| a pressure | *"The unit switches itself off when the refrigerant pressure reaches 385 psi. That is the safety limit printed on the chart — it is there to protect the compressor from damage."* |
+| a voltage | *"This unit is wired for 240 V. If the power at the site does not match, the machine will not run correctly."* |
+| a model | *"This unit is a NP-42. Everything about it — the parts, the settings, the procedure — follows from that number."* |
+| a fault code | *"The control board is reporting LP-2. That code is the unit telling you what it thinks is wrong."* |
 
-- **The box at the top** is the whole interface. Type a question, press
-  <kbd>Enter</kbd>. Press <kbd>/</kbd> from anywhere to jump back to it.
-- **The example questions** are grouped by where the answer lives — manual,
-  photo, call. Click one to run it.
-- **Answer** is the fragment, with a **Copy** button. Underneath: how long it
-  took, how many candidates each searcher contributed, and a confidence score.
-- **How this was found** is the retrieval trace: 40 text hits, 40 picture
-  hits, 19 audio hits → 99 fused → 29 reranked → 27 fragments read. Below it,
-  the **winning fragment** verbatim, with its page, region and cross-encoder
-  score. This is the part that answers "why did it say that?".
-- **Evidence** is the picture, the region, and the score for each candidate.
-  Click any image to enlarge it; **full page** opens the page with the region
-  outlined; **raw** opens the underlying chunk, including its OCR text.
-- A question in the URL runs itself, so an answer can be shared as a link.
+A glossary of ~40 terms ships with it, and the interface renders the terms
+that appear in a given answer as clickable chips.
 
 ---
 
@@ -366,61 +421,74 @@ fieldnote serve         # http://127.0.0.1:8000/
 | `fieldnote verify` | check the fixtures are honest |
 | `fieldnote models` | pre-download every model |
 
-### The API
+### Asking from the terminal
 
 ```bash
-curl -X POST http://127.0.0.1:8000/ask \
-  -H "Content-Type: application/json" \
-  -d '{"question":"What model number is stamped on the nameplate in the job site photo?","include_crops":true}'
+fieldnote ask "What is the high-pressure cutout pressure labeled on the R-410A pressure-temperature curve?"
 ```
 
-```json
-{
-  "answer": "MODEL NP-42",
-  "latency_ms": 2732.4,
-  "citations": [{
-    "modality": "image",
-    "doc_title": "Job Photo - Unit 7 Nameplate",
-    "page": null,
-    "region": "job_photo",
-    "crop_b64": "data:image/png;base64,iVBORw0KGgo..."
-  }],
-  "trace": { "spaces": {"text": 40, "image": 40, "audio": 19}, "fused": 99, "units": 27 }
-}
 ```
+385 (385 PSI)
 
-| endpoint | what it does |
-|---|---|
-| `POST /ask` | ask a question; returns the answer, the citations and the trace |
-| `GET /` | the browser UI |
-| `GET /health` | liveness and index state |
-| `GET /page/{chunk_id}` | the full page with the cited region outlined |
-| `GET /evidence/{chunk_id}` | the raw chunk behind a citation |
-| `GET /docs` | interactive OpenAPI documentation |
+ #  modality  source                            page  region   crop
+ 1  image     Trane Precedent YSC072 Service M…   11   chart    …/p0011-r00-chart.png
+ 2  text      Trane Precedent YSC072 Service M…   11   page_te… -
+ 3  image     Trane Precedent YSC072 Service M…   12   wiring…  …/p0012-r00-wiring_diagram.png
+```
 
 ---
 
-## 8. Deploy it with Docker
+## 8. Deploy it
+
+### Docker (one command)
 
 ```bash
 docker compose up -d --build
 ```
 
-That is the whole thing. The image is CPU-only (no CUDA, ~2 GB smaller), ships
-the models so the first request is not a two-gigabyte download, runs as a
-non-root user, and builds the corpus and the index on first start into a named
-volume. There is a healthcheck, so `docker compose ps` tells you when it is
-ready.
-
-To publish it:
+The image is CPU-only (no CUDA, ~2 GB smaller), ships the models so the first
+request is not a two-gigabyte download, runs as a non-root user, has a
+healthcheck, and builds the corpus and the index on first start into a named
+volume. `docker compose ps` tells you when it is ready.
 
 ```bash
-./scripts/docker_up.sh        # macOS / Linux
+./scripts/docker_up.sh        # macOS / Linux: build, wait, publish, print the URL
 ./scripts/docker_up.ps1       # Windows
 ```
 
-Both build the image, start the service, wait for it to become healthy, then
-open a public https tunnel and print the URL.
+Both wrap the whole sequence — build, start, wait for healthy, open a public
+https tunnel, print the URL — into one command.
+
+### A durable, self-healing publication
+
+`fieldnote serve --tunnel` publishes a URL that lasts as long as the process.
+For something that stays up across reboots, use the publisher script:
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1
+```
+
+It starts the API and the tunnel **detached**, waits for both, writes the
+public URL to `data/artifacts/live_url.txt`, and **restarts either of them if
+they die**. Register it to run at every logon:
+
+```bash
+powershell -ExecutionPolicy Bypass -File scripts\install_autostart.ps1
+```
+
+### A plain VPS
+
+```bash
+git clone https://github.com/Gunjannnn30/fieldnote.git && cd fieldnote
+python3 -m venv .venv && . .venv/bin/activate
+pip install -e .
+
+fieldnote models
+fieldnote build && fieldnote ingest && fieldnote index
+```
+
+Then run it under systemd, with nginx or Caddy in front for TLS — or just
+`scripts/publish.ps1`/`docker_up.sh` if you want the tunnel.
 
 ### Point it at your own data
 
@@ -434,9 +502,55 @@ fieldnote ingest
 fieldnote index
 ```
 
+`FIELDNOTE_DATA_DIR` moves the whole data tree (corpus, index, artefacts),
+which is what the container volume uses.
+
 ---
 
-## 9. How to explain this to someone else
+## 9. The API
+
+```bash
+curl -X POST http://127.0.0.1:8000/ask \
+  -H "Content-Type: application/json" \
+  -d '{"question":"What model number is stamped on the nameplate in the job site photo?","include_crops":true}'
+```
+
+```json
+{
+  "answer": "MODEL NP-42",
+  "explanation": "This unit is a NP-42. Everything about it - the parts, the settings, the procedure - follows from that number.",
+  "headline": "Model: NP-42",
+  "glossary": [{"term": "model number", "meaning": "the code that identifies which exact machine this is"}],
+  "latency_ms": 2732.4,
+  "answerable": true,
+  "citations": [{
+    "chunk_id": "job-photo-unit-7-nameplate-img:job_photo_unit_7_nameplate",
+    "modality": "image",
+    "doc_title": "Job Photo - Unit 7 Nameplate",
+    "page": null,
+    "region": "job_photo",
+    "crop_b64": "data:image/png;base64,iVBORw0KGgo..."
+  }],
+  "trace": {
+    "spaces": {"text": 40, "image": 40, "audio": 19},
+    "fused": 99, "shortlist": 27, "units": 27,
+    "winner": {"chunk_id": "...", "modality": "image", "text": "MODEL NP-42", "page": null}
+  }
+}
+```
+
+| endpoint | what it does |
+|---|---|
+| `POST /ask` | ask a question; returns the answer, the plain-English version, the citations and the trace |
+| `GET /` | the browser UI |
+| `GET /health` | liveness, and the state of the corpus and index |
+| `GET /page/{chunk_id}` | the full page with the cited region outlined (PNG) |
+| `GET /evidence/{chunk_id}` | the raw chunk behind a citation, including its OCR text |
+| `GET /docs` | interactive OpenAPI documentation |
+
+---
+
+## 10. How to explain this to someone else
 
 **Ten seconds**
 
@@ -449,8 +563,8 @@ fieldnote index
 
 > A tech on a roof types one question. Fieldnote searches the manuals, the job
 > photos and the recorded support calls at the same time, with a different
-> searcher for each — one that reads text, one that looks at pictures, one that
-> listens to sound. It then ranks what each one found and picks the best
+> searcher for each — one that reads words, one that looks at pictures, one
+> that listens to sound. It then ranks what each one found and picks the best
 > evidence.
 >
 > The important part: the picture searcher works on the actual pixels. A
@@ -478,7 +592,7 @@ fieldnote index
 > **The approach.** Fieldnote indexes each modality in the space where its
 > signal is strongest — pixels for images, waveforms for audio, tokens for
 > prose — and fuses the three result lists with Reciprocal Rank Fusion before
-> a cross-encoder makes the final call. The picture is still pixels at the
+> a relevance model makes the final call. The picture is still pixels at the
 > moment the question is asked, so the numbers are still there.
 >
 > **The evidence.** On a 40-question eval where 15 questions are *provably*
@@ -495,20 +609,22 @@ fieldnote index
 
 ---
 
-## 10. Honest limitations
+## 11. Honest limitations
 
 - **The corpus is synthetic.** There are no real HVAC manuals in this
   repository. The system is real, but the numbers above are measured on a
   corpus we generated, and 300 scanned manuals will be harder — noisier OCR,
   worse figure detection, more languages.
 - **Latency is measured on 8 CPU cores** with the deterministic synthesiser.
-  The p95 of 2.9 s is under the 6 s budget. The VLM synthesiser path
+  The p95 of 2.4 s is under the 6 s budget. The VLM synthesiser path
   (`FIELDNOTE_SYNTHESIS=vlm`) is far slower and is not what the gate is
   measured against.
 - **The answer is extractive by default**: it picks the best-supported
   fragment and states it, rather than writing prose. That is deliberate for a
   field tool — a number that can be traced beats a paragraph that reads well —
-  and it is what makes the citations meaningful.
+  and it is what makes the citations meaningful. The plain-English layer is
+  generated, but from a template matched to the kind of value the question
+  asked for, not by a language model.
 - **The charts it reads best are charts with labels.** A value printed *on* a
   curve is read exactly. A value at an arbitrary point on an unmarked curve
   needs a model that can interpolate, and the answer should be marked as an
@@ -516,24 +632,23 @@ fieldnote index
 - **Audio was never the hard modality.** The baseline gets the audio questions
   nearly right too, because a transcript *is* text. The interesting result is
   the one about images, and the eval is shaped to make that visible.
-- **The Docker path needs a host that can run Linux containers.** On this
-  machine Docker Desktop is installed and the WSL2 features are enabled, but
-  the host is itself a guest without nested virtualization, so the Linux
-  engine cannot start here. The compose file and image are complete and the
-  `docker compose config` check passes; on a normal machine or VPS,
-  `docker compose up -d --build` is the whole deployment.
+- **The public tunnel URL changes when the tunnel restarts.** For a fixed
+  address you need a named tunnel on your own domain. Everything else —
+  Docker, the systemd unit, the reverse proxy — is fixed.
 
 ---
 
-## 11. Design notes, layout, tests
+## 12. Design notes, layout, tests
 
 **[docs/DESIGN.md](docs/DESIGN.md)** covers early fusion versus late fusion in
 full, why converting a chart to a caption throws away the axis values the
 question actually needed, the module map, the scoring model and its weights,
-and the seven bugs that cost the most time — including a chunk-id collision
-that silently turned every picture into its own caption, and a 28-second
-latency that was really 150 cross-encoder calls and 63 re-encodings per
-question.
+the interface decisions, and the bugs that cost the most time — including a
+chunk-id collision that silently turned every picture into its own caption, a
+28-second latency that was really 150 relevance-model calls and 63
+re-encodings per question, and an application-control policy that made
+`scikit-learn` unloadable and took `sentence-transformers` out of the
+dependency tree.
 
 ```
 fieldnote/
@@ -544,8 +659,8 @@ fieldnote/
   ingest/              pdf, images, audio -> chunks
   vision/              region detection, OCR, OCR de-mangling
   store/               sqlite | pgvector | qdrant, one space per modality
-  retrieve/            parallel search, RRF fusion, cross-encoder reranking
-  answer/              evidence units, synthesis, citations, VLM engine
+  retrieve/            parallel search, RRF fusion, relevance reranking
+  answer/              evidence units, plain English, synthesis, citations
   baseline/            the caption-only system, implemented properly
   eval/                dataset, grader, runner, report
   fixtures/            the synthetic corpus and its self-checks
