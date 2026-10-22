@@ -69,6 +69,9 @@ class Settings(BaseSettings):
     # Optional shared secret for the HTTP API. Set it when the service is
     # published on the open internet.
     api_key: str = ""
+    # The address people should share. A quick tunnel's address changes on
+    # every restart, so the publisher sets this to the stable redirect.
+    public_url: str = ""
 
     def ensure_dirs(self) -> None:
         for p in (self.data_dir, self.corpus_dir, self.index_dir, self.artifacts_dir):

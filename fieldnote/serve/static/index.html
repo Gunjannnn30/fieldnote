@@ -386,6 +386,7 @@
   <footer>
     <span>Fieldnote — multimodal retrieval for HVAC field service.</span>
     <span class="sp">
+      <a href="#" id="shareLink">Share this link</a> ·
       <a href="/docs">API</a> ·
       <a href="/health">health</a> ·
       <a href="https://github.com/Gunjannnn30/fieldnote" target="_blank" rel="noopener">source</a>
@@ -447,6 +448,28 @@ function setCompact(on) {
     });
   });
 }
+
+/* ---------------- share the stable link ---------------- */
+$("shareLink").addEventListener("click", async e => {
+  e.preventDefault();
+  // The tunnel's own address changes on every restart, so share the stable
+  // one when the service knows it.
+  let base = window.location.origin;
+  try {
+    const h = await fetch("/health").then(r => r.json());
+    if (h && h.public_url) base = h.public_url.replace(/\/$/, "");
+  } catch (err) { /* fall back to this origin */ }
+  const url = new URL(base + window.location.pathname);
+  if ($("q").value.trim()) url.searchParams.set("q", $("q").value.trim());
+  const full = url.toString();
+  try {
+    await navigator.clipboard.writeText(full);
+    $("shareLink").textContent = "Link copied";
+  } catch {
+    $("shareLink").textContent = full;
+  }
+  setTimeout(() => { $("shareLink").textContent = "Share this link"; }, 2000);
+});
 
 /* ---------------- the "how it works" panel ---------------- */
 $("howtoLink").addEventListener("click", e => {

@@ -18,6 +18,7 @@ def main() -> int:
     out = Path(sys.argv[2] if len(sys.argv) > 2 else "data/artifacts/ui.png")
     width = sys.argv[3] if len(sys.argv) > 3 else "1280"
     height = sys.argv[4] if len(sys.argv) > 4 else "1400"
+    timeout = int(sys.argv[5]) if len(sys.argv) > 5 else 180
     out.parent.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory() as profile:
@@ -34,13 +35,18 @@ def main() -> int:
             f"--screenshot={out.resolve()}",
             url,
         ]
-        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=180)
+        try:
+            proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+        except subprocess.TimeoutExpired:
+            print(f"timed out after {timeout}s (the page may still have been captured)")
+            proc = None
     if out.exists():
         print(f"wrote {out} ({out.stat().st_size // 1024} KB)")
         return 0
     print("screenshot failed")
-    print(proc.stdout[-800:])
-    print(proc.stderr[-800:])
+    if proc is not None:
+        print(proc.stdout[-800:])
+        print(proc.stderr[-800:])
     return 1
 
 

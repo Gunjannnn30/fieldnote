@@ -101,6 +101,25 @@ def _to_payload(answer: Answer, include_crops: bool) -> list[CitationPayload]:
     return out
 
 
+def _public_url() -> str:
+    """The address people should share.
+
+    A quick tunnel's address changes on every restart, so the publisher writes
+    the stable redirect here and the service reads it fresh each time.
+    """
+    if settings.public_url:
+        return settings.public_url
+    pointer = settings.artifacts_dir / "stable_url.txt"
+    if pointer.exists():
+        try:
+            value = pointer.read_text(encoding="utf-8").strip()
+            if value:
+                return value
+        except OSError:
+            pass
+    return ""
+
+
 def create_app(backend: str | None = None) -> FastAPI:
     app = FastAPI(
         title="Fieldnote",
@@ -157,6 +176,7 @@ def create_app(backend: str | None = None) -> FastAPI:
             "loaded": state["system"] is not None,
             "corpus": manifest.exists(),
             "index": index.exists(),
+            "public_url": _public_url(),
         }
 
     @app.get("/", include_in_schema=False)

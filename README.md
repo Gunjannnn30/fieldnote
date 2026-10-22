@@ -406,6 +406,10 @@ fieldnote index         # encode into the vector store
 fieldnote serve         # http://127.0.0.1:8000/
 ```
 
+**Try it right now:** the live demo is at
+**https://gunjannnn30.github.io/fieldnote/** — that address never changes, and
+it always lands on the running service.
+
 `build`, `ingest` and `index` are one-time setup. After that it is just
 `fieldnote serve`.
 
@@ -478,6 +482,32 @@ they die**. Register it to run at every logon:
 powershell -ExecutionPolicy Bypass -File scripts\install_autostart.ps1
 ```
 
+### The address that never changes
+
+A quick tunnel gets a **random** address, and it changes every time the
+tunnel restarts. Fine for a service; useless for a link you put in a README
+or send to somebody.
+
+So the publisher also writes the current address to a **gist**, and a
+**GitHub Pages** site reads that gist and redirects to it:
+
+```
+  https://gunjannnn30.github.io/fieldnote/     <- never changes
+        |
+        |  reads the gist, redirects
+        v
+  https://<random>.trycloudflare.com           <- changes on every restart
+        |
+        v
+  the service
+```
+
+The gist is rewritten the moment the tunnel is republished, and the Pages
+site reads it without a rebuild, so the stable address follows the service
+automatically. The publisher writes the stable address to
+`data/artifacts/stable_url.txt`, and the interface's **Share this link**
+button copies it rather than the throwaway tunnel address.
+
 ### "Is the link live forever, and can anyone open it?"
 
 Two separate questions, with two different answers.
@@ -488,32 +518,28 @@ internet, put a key on it — `FIELDNOTE_API_KEY` (or `-ApiKey`) makes the API
 require an `X-Fieldnote-Key` header, while `/` and `/health` stay open so you
 can still check that it is up.
 
-**Is it live forever? No, not this URL.** The address `cloudflared` picks for
-a quick tunnel is a *random* subdomain, and it changes whenever the tunnel
-restarts. The link is dead if the machine is off, if the tunnel is down, or if
-the tunnel is restarted by anything other than a continuation. The scheduled
-task brings the service back at every logon — but with a **new** address.
-
-| | survives a reboot? | same address every time? | needs this machine? |
-|---|---|---|---|
-| quick tunnel (what the script does) | service comes back, **address changes** | no | yes |
-| named Cloudflare tunnel | yes | **yes** | yes |
-| a small VPS + a domain | yes | **yes** | no |
-
-For an address that never changes, the two real options are a **named
-Cloudflare tunnel** (free; needs a Cloudflare account and a domain you own) or
-**a small VPS** (a few euros a month; a static address, always on, and the
-Docker Compose stack runs there instead of on your laptop). Either is a
-half-hour's work once you have an account and a domain.
-
-Two things this repository already does to keep the tunnel alive, both of
-which matter more than people expect:
+**Is it live forever? Not by itself.** The stable address is permanent, but
+the service behind it lives on a laptop. It needs the machine to be on, awake
+and connected. Three things this repository does about that:
 
 - **the machine is never allowed to sleep** — a laptop that suspends after ten
   minutes takes the tunnel with it, and that is the single most common reason
   a link like this "worked for a while and then stopped";
 - **the watchdog restarts the tunnel and the API** if either dies, and
-  rewrites the address file, so the service heals without anybody watching.
+  rewrites the address files, so the service heals without anybody watching;
+- **a scheduled task brings it back at every logon**, so a reboot costs you
+  nothing.
+
+What still gets you is a **host that is always on** - a small VPS with a
+domain, where the Docker Compose stack runs instead of on your laptop. The
+compose file is ready; it needs an account and a domain, which is the one
+thing nobody can create on your behalf.
+
+| | survives a reboot? | same address every time? | needs this machine? |
+|---|---|---|---|
+| stable Pages link + quick tunnel | **yes** | **yes** | yes |
+| named Cloudflare tunnel | yes | yes | yes |
+| a small VPS + a domain | yes | yes | no |
 
 ### A plain VPS
 

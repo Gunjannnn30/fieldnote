@@ -104,11 +104,40 @@ function Start-Tunnel {
             }
             Write-Host "    url file  $urlFile" -ForegroundColor DarkGray
             Write-Host ''
+            Publish-StableUrl -LiveUrl $url
             return $p
         }
         if ($p.HasExited) { throw 'cloudflared exited before publishing a url' }
     }
     throw 'cloudflared did not publish a url in time'
+}
+
+function Publish-StableUrl {
+    <#
+      A quick tunnel gets a random address, so the address in the url file
+      changes whenever the tunnel restarts. The stable address - a GitHub
+      Pages redirect that reads the current address from a gist - is written
+      to stable_url.txt so there is always one link worth sharing.
+    #>
+    param([Parameter(Mandatory = $true)][string]$LiveUrl)
+
+    $script = Join-Path $root 'scripts\publish_url.py'
+    if (-not (Test-Path $script)) { return }
+    try {
+        $out = (& python $script $LiveUrl 2>&1 | Out-String)
+        $out | Out-File -FilePath (Join-Path $artifacts 'publish_url.log') -Encoding UTF8
+        $stable = $null
+        if ($out -match 'stable\s*:\s*(\S+)') { $stable = $Matches[1] }
+        if ($stable) {
+            Set-Content -Path (Join-Path $artifacts 'stable_url.txt') -Value $stable -Encoding UTF8
+            Write-Host "    STABLE    $stable" -ForegroundColor Green
+            Write-Host "    (that address never changes; it always points here)" -ForegroundColor DarkGray
+            Write-Host ''
+        } else {
+            Write-Host "    could not publish the stable address - see publish_url.log" -ForegroundColor DarkYellow
+        }    } catch {
+        Write-Host "    could not publish the stable address: $($_.Exception.Message)" -ForegroundColor DarkYellow
+    }
 }
 
 $tunnel = Start-Tunnel
