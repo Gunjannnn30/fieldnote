@@ -66,6 +66,9 @@ class Settings(BaseSettings):
     torch_threads: int = 4
     ocr_enabled: bool = True
     seed: int = 7
+    # Optional shared secret for the HTTP API. Set it when the service is
+    # published on the open internet.
+    api_key: str = ""
 
     def ensure_dirs(self) -> None:
         for p in (self.data_dir, self.corpus_dir, self.index_dir, self.artifacts_dir):

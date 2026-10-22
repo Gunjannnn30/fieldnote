@@ -14,7 +14,7 @@ import time
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 
@@ -111,6 +111,22 @@ def create_app(backend: str | None = None) -> FastAPI:
         ),
     )
     state: dict[str, Any] = {"system": None}
+
+    # An optional shared secret, for when the service is published on the
+    # open internet. Off by default, because a demo link nobody can reach is
+    # not a demo.
+    api_key = settings.api_key
+
+    @app.middleware("http")
+    async def _check_key(request: Request, call_next):
+        if api_key and request.url.path not in ("/health", "/"):
+            supplied = request.headers.get("x-fieldnote-key") or request.query_params.get("key")
+            if supplied != api_key:
+                return JSONResponse(
+                    {"detail": "missing or wrong API key (X-Fieldnote-Key)"},
+                    status_code=401,
+                )
+        return await call_next(request)
 
     def _system():
         if state["system"] is None:

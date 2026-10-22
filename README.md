@@ -466,6 +466,8 @@ For something that stays up across reboots, use the publisher script:
 
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts\publish.ps1
+# with a shared secret on the public link:
+powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -ApiKey "s3cret"
 ```
 
 It starts the API and the tunnel **detached**, waits for both, writes the
@@ -475,6 +477,43 @@ they die**. Register it to run at every logon:
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts\install_autostart.ps1
 ```
+
+### "Is the link live forever, and can anyone open it?"
+
+Two separate questions, with two different answers.
+
+**Can anyone open it? Yes.** The URL is public `https`. No account, no VPN,
+no allow-list. Verified from off the machine. If you publish it on the open
+internet, put a key on it — `FIELDNOTE_API_KEY` (or `-ApiKey`) makes the API
+require an `X-Fieldnote-Key` header, while `/` and `/health` stay open so you
+can still check that it is up.
+
+**Is it live forever? No, not this URL.** The address `cloudflared` picks for
+a quick tunnel is a *random* subdomain, and it changes whenever the tunnel
+restarts. The link is dead if the machine is off, if the tunnel is down, or if
+the tunnel is restarted by anything other than a continuation. The scheduled
+task brings the service back at every logon — but with a **new** address.
+
+| | survives a reboot? | same address every time? | needs this machine? |
+|---|---|---|---|
+| quick tunnel (what the script does) | service comes back, **address changes** | no | yes |
+| named Cloudflare tunnel | yes | **yes** | yes |
+| a small VPS + a domain | yes | **yes** | no |
+
+For an address that never changes, the two real options are a **named
+Cloudflare tunnel** (free; needs a Cloudflare account and a domain you own) or
+**a small VPS** (a few euros a month; a static address, always on, and the
+Docker Compose stack runs there instead of on your laptop). Either is a
+half-hour's work once you have an account and a domain.
+
+Two things this repository already does to keep the tunnel alive, both of
+which matter more than people expect:
+
+- **the machine is never allowed to sleep** — a laptop that suspends after ten
+  minutes takes the tunnel with it, and that is the single most common reason
+  a link like this "worked for a while and then stopped";
+- **the watchdog restarts the tunnel and the API** if either dies, and
+  rewrites the address file, so the service heals without anybody watching.
 
 ### A plain VPS
 

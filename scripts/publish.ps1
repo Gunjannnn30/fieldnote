@@ -19,12 +19,16 @@
 [CmdletBinding()]
 param(
   [int]$Port = 8000,
-  [switch]$Docker
+  [switch]$Docker,
+  [string]$ApiKey = ''
 )
 
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 Set-Location $root
+
+if ($ApiKey) { $env:FIELDNOTE_API_KEY = $ApiKey }
+else { Remove-Item Env:\FIELDNOTE_API_KEY -ErrorAction SilentlyContinue }
 
 $artifacts = Join-Path $root 'data\artifacts'
 New-Item -ItemType Directory -Force -Path $artifacts | Out-Null
@@ -95,6 +99,9 @@ function Start-Tunnel {
             Write-Host ''
             Write-Host "    LIVE UI   $url/" -ForegroundColor Green
             Write-Host "    LIVE API  $url/docs" -ForegroundColor Green
+            if ($ApiKey) {
+                Write-Host "    API key   $ApiKey  (send it as X-Fieldnote-Key, or ?key=)" -ForegroundColor DarkGray
+            }
             Write-Host "    url file  $urlFile" -ForegroundColor DarkGray
             Write-Host ''
             return $p
