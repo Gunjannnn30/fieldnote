@@ -476,10 +476,21 @@ powershell -ExecutionPolicy Bypass -File scripts\publish.ps1 -ApiKey "s3cret"
 
 It starts the API and the tunnel **detached**, waits for both, writes the
 public URL to `data/artifacts/live_url.txt`, and **restarts either of them if
-they die**. Register it to run at every logon:
+they die**.
+
+**Starting at logon is opt-in**, and it is deliberately not enabled by
+default — some people want the link back after a reboot, and some people do
+not want anything running at startup at all. To turn it on:
 
 ```bash
 powershell -ExecutionPolicy Bypass -File scripts\install_autostart.ps1
+```
+
+To turn it back off (removes the scheduled task, leaves the running service
+alone):
+
+```bash
+Unregister-ScheduledTask -TaskName Fieldnote -Confirm:$false
 ```
 
 ### The address that never changes
